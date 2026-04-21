@@ -13,7 +13,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
+        display: ["Cinzel", "Inter", "system-ui", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -30,6 +30,9 @@ export default {
         card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
         streak: { DEFAULT: "hsl(var(--streak))", foreground: "hsl(var(--streak-foreground))" },
         xp: { DEFAULT: "hsl(var(--xp))", foreground: "hsl(var(--xp-foreground))" },
+        mana: { DEFAULT: "hsl(var(--mana))", foreground: "hsl(var(--mana-foreground))" },
+        leaf: "hsl(var(--leaf))",
+        rune: "hsl(var(--rune))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

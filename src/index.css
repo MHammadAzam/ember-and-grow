@@ -1,136 +1,200 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* LifeForge AI — Mystical Fantasy Forest design system.
+   All colors HSL. Tokens only — never hardcode in components. */
 @layer base {
   :root {
-    --background: 40 20% 98%;
-    --foreground: 220 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
-    --primary: 152 60% 42%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 40 30% 95%;
-    --secondary-foreground: 220 20% 10%;
-    --muted: 40 20% 94%;
-    --muted-foreground: 220 10% 46%;
-    --accent: 30 90% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
+    /* Misty dawn forest light theme */
+    --background: 90 25% 96%;
+    --foreground: 150 30% 12%;
+    --card: 90 30% 99%;
+    --card-foreground: 150 30% 12%;
+    --popover: 90 30% 99%;
+    --popover-foreground: 150 30% 12%;
+
+    /* Emerald primary */
+    --primary: 158 64% 32%;
+    --primary-foreground: 60 30% 96%;
+    --primary-glow: 158 70% 48%;
+
+    /* Mossy secondary */
+    --secondary: 90 20% 92%;
+    --secondary-foreground: 150 30% 18%;
+    --muted: 90 18% 90%;
+    --muted-foreground: 150 12% 38%;
+
+    /* Magical gold accent (runes) */
+    --accent: 42 78% 50%;
+    --accent-foreground: 150 30% 12%;
+    --accent-glow: 48 95% 62%;
+
+    --destructive: 0 65% 48%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 152 60% 42%;
-    --radius: 0.75rem;
+    --border: 150 18% 85%;
+    --input: 150 18% 85%;
+    --ring: 158 64% 32%;
+    --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 152 60% 42%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 152 30% 95%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 152 60% 42%;
+    /* RPG tokens */
+    --streak: 18 88% 52%;          /* ember */
+    --streak-foreground: 60 30% 96%;
+    --xp: 268 55% 52%;             /* arcane */
+    --xp-foreground: 60 30% 96%;
+    --mana: 200 75% 50%;           /* river */
+    --mana-foreground: 60 30% 96%;
+    --leaf: 130 55% 42%;
+    --rune: 42 78% 50%;
+    --shadow-rune: 42 78% 50% / 0.35;
 
-    /* Custom tokens */
-    --streak: 25 95% 53%;
-    --streak-foreground: 0 0% 100%;
-    --xp: 262 60% 55%;
-    --xp-foreground: 0 0% 100%;
-    --success: 152 60% 42%;
-    --warning: 38 92% 50%;
-    --glass: 0 0% 100% / 0.7;
-    --glass-border: 0 0% 100% / 0.2;
+    /* Glass */
+    --glass: 90 30% 99% / 0.65;
+    --glass-border: 150 30% 60% / 0.18;
+
+    /* Gradients */
+    --gradient-forest: linear-gradient(135deg, hsl(158 64% 32%), hsl(130 55% 42%));
+    --gradient-rune: linear-gradient(135deg, hsl(42 78% 50%), hsl(48 95% 62%));
+    --gradient-arcane: linear-gradient(135deg, hsl(268 55% 52%), hsl(200 75% 50%));
+    --gradient-ember: linear-gradient(135deg, hsl(18 88% 52%), hsl(35 95% 58%));
+    --gradient-mist: radial-gradient(ellipse at top, hsl(158 50% 92% / 0.8), transparent 60%),
+                     radial-gradient(ellipse at bottom, hsl(90 30% 95%), hsl(90 25% 96%));
+
+    /* Shadows */
+    --shadow-leaf: 0 10px 30px -12px hsl(158 64% 32% / 0.35);
+    --shadow-rune-glow: 0 0 24px hsl(42 78% 50% / 0.45);
+
+    /* Sidebar (kept for shadcn) */
+    --sidebar-background: 90 25% 96%;
+    --sidebar-foreground: 150 30% 18%;
+    --sidebar-primary: 158 64% 32%;
+    --sidebar-primary-foreground: 60 30% 96%;
+    --sidebar-accent: 90 20% 90%;
+    --sidebar-accent-foreground: 150 30% 18%;
+    --sidebar-border: 150 18% 85%;
+    --sidebar-ring: 158 64% 32%;
 
     font-family: 'Inter', system-ui, sans-serif;
   }
 
   .dark {
-    --background: 220 20% 7%;
-    --foreground: 40 20% 95%;
-    --card: 220 20% 10%;
-    --card-foreground: 40 20% 95%;
-    --popover: 220 20% 10%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 152 60% 48%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 15%;
-    --secondary-foreground: 40 20% 95%;
-    --muted: 220 15% 15%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 30 90% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 152 60% 48%;
-    --glass: 220 20% 10% / 0.7;
-    --glass-border: 220 20% 20% / 0.3;
+    /* Deep enchanted forest at dusk */
+    --background: 150 30% 7%;
+    --foreground: 90 25% 92%;
+    --card: 150 30% 10%;
+    --card-foreground: 90 25% 92%;
+    --popover: 150 30% 10%;
+    --popover-foreground: 90 25% 92%;
+
+    --primary: 158 65% 45%;
+    --primary-foreground: 150 30% 7%;
+    --primary-glow: 158 80% 60%;
+
+    --secondary: 150 25% 14%;
+    --secondary-foreground: 90 25% 92%;
+    --muted: 150 25% 14%;
+    --muted-foreground: 90 12% 60%;
+
+    --accent: 42 85% 58%;
+    --accent-foreground: 150 30% 7%;
+    --accent-glow: 48 100% 68%;
+
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 90 25% 92%;
+    --border: 150 25% 18%;
+    --input: 150 25% 18%;
+    --ring: 158 65% 45%;
+
+    --streak: 18 90% 58%;
+    --xp: 268 60% 60%;
+    --mana: 200 80% 58%;
+    --leaf: 130 55% 50%;
+
+    --glass: 150 30% 10% / 0.65;
+    --glass-border: 158 50% 50% / 0.2;
+
+    --gradient-forest: linear-gradient(135deg, hsl(158 65% 32%), hsl(130 55% 28%));
+    --gradient-rune: linear-gradient(135deg, hsl(42 85% 50%), hsl(48 95% 62%));
+    --gradient-arcane: linear-gradient(135deg, hsl(268 60% 45%), hsl(200 80% 45%));
+    --gradient-ember: linear-gradient(135deg, hsl(18 90% 50%), hsl(35 95% 55%));
+    --gradient-mist: radial-gradient(ellipse at top, hsl(158 60% 18% / 0.8), transparent 60%),
+                     radial-gradient(ellipse at bottom, hsl(150 30% 9%), hsl(150 30% 6%));
+
+    --shadow-leaf: 0 10px 40px -10px hsl(158 70% 25% / 0.6);
+    --shadow-rune-glow: 0 0 28px hsl(42 85% 55% / 0.5);
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
+  html, body, #root { @apply h-full; }
   body {
     @apply bg-background text-foreground antialiased;
+    background-image: var(--gradient-mist);
+    background-attachment: fixed;
   }
   h1, h2, h3, h4 {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Cinzel', 'Inter', serif;
+    letter-spacing: 0.01em;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-card/70 backdrop-blur-xl border border-border/50 shadow-lg;
+    @apply bg-card/70 backdrop-blur-xl border border-border/60 shadow-[var(--shadow-leaf)];
   }
   .glass-card-hover {
     @apply glass-card transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5;
   }
-  .gradient-primary {
-    @apply bg-gradient-to-br from-primary to-primary/80;
+  .gradient-forest { background: var(--gradient-forest); }
+  .gradient-rune { background: var(--gradient-rune); }
+  .gradient-arcane { background: var(--gradient-arcane); }
+  .gradient-ember { background: var(--gradient-ember); }
+  .text-gradient-forest {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-forest);
   }
-  .gradient-streak {
-    background: linear-gradient(135deg, hsl(var(--streak)), hsl(25 95% 60%));
+  .text-gradient-rune {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-rune);
   }
-  .gradient-xp {
-    background: linear-gradient(135deg, hsl(var(--xp)), hsl(280 60% 60%));
+  .rune-glow {
+    box-shadow: var(--shadow-rune-glow);
   }
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  /* Mobile safe area padding for bottom nav */
+  .pb-safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0) + 5.5rem);
   }
 }
 
 @layer utilities {
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite alternate;
-  }
-  .animate-shake {
-    animation: shake 0.5s ease-in-out;
-  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-glow { animation: glow 2.5s ease-in-out infinite alternate; }
+  .animate-shake { animation: shake 0.5s ease-in-out; }
+  .animate-rune-pulse { animation: rune-pulse 3s ease-in-out infinite; }
+  .animate-leaf-sway { animation: leaf-sway 5s ease-in-out infinite; }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
-
 @keyframes glow {
-  from { box-shadow: 0 0 5px hsl(var(--primary) / 0.3), 0 0 20px hsl(var(--primary) / 0.1); }
-  to { box-shadow: 0 0 10px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.2); }
+  from { box-shadow: 0 0 8px hsl(var(--primary) / 0.3), 0 0 24px hsl(var(--primary) / 0.15); }
+  to   { box-shadow: 0 0 14px hsl(var(--primary) / 0.55), 0 0 44px hsl(var(--primary) / 0.25); }
 }
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
   75% { transform: translateX(5px); }
+}
+@keyframes rune-pulse {
+  0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 4px hsl(var(--accent) / 0.4)); }
+  50%      { opacity: 1; filter: drop-shadow(0 0 12px hsl(var(--accent) / 0.8)); }
+}
+@keyframes leaf-sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2deg); }
 }
