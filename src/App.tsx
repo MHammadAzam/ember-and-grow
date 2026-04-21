@@ -5,7 +5,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import World from "./pages/World";
+import Quests from "./pages/Quests";
+import Stats from "./pages/Stats";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import AppShell from "./components/AppShell";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +22,13 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route element={<AppShell />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/world" element={<World />} />
+            <Route path="/quests" element={<Quests />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
