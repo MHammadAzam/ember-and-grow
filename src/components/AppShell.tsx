@@ -1,8 +1,12 @@
 import { Outlet, Link } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import { useTheme } from "@/hooks/useTheme";
 
 /** App shell for the authenticated/main routes. Provides top brand bar + bottom nav. */
 export default function AppShell() {
+  const { dark, toggle } = useTheme();
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -11,9 +15,19 @@ export default function AppShell() {
             <span className="text-xl animate-rune-pulse">🜂</span>
             <span className="text-gradient-forest">LifeForge AI</span>
           </Link>
-          <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
-            Forge your habits
-          </span>
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+            title={dark ? "Switch to light mode" : "Switch to dark mode"}
+            className="relative w-9 h-9 rounded-full border border-border/60 bg-card/60 hover:bg-card transition-colors flex items-center justify-center text-foreground"
+          >
+            {dark ? (
+              <Sun className="w-4 h-4 text-accent" />
+            ) : (
+              <Moon className="w-4 h-4 text-primary" />
+            )}
+          </button>
         </div>
       </header>
 

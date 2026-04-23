@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Moon, Sun, Download, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,23 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { getProfile, saveProfile } from "@/lib/habitStore";
+import { useTheme } from "@/hooks/useTheme";
 import { toast } from "sonner";
-
-const THEME_KEY = "lifeforge_theme";
 
 export default function Settings() {
   const [profile, setProfileState] = useState(getProfile);
   const [name, setName] = useState(profile.name);
-  const [dark, setDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem(THEME_KEY);
-    if (saved) return saved === "dark";
-    return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
-  }, [dark]);
+  const { dark, setDark } = useTheme();
 
   const saveName = () => {
     const next = { ...profile, name: name.trim() || "Adventurer" };
