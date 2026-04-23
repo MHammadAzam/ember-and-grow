@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, Plus, Compass, AlertCircle } from "lucide-react";
+import { Sparkles, Wand2, Plus, Compass, AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -11,6 +11,7 @@ import {
   saveHabits,
   HABIT_COLORS,
   type Habit,
+  type MoodEntry,
 } from "@/lib/habitStore";
 import { toast } from "sonner";
 
@@ -28,23 +29,74 @@ interface CoachResponse {
 }
 
 const CACHE_KEY = "lifeforge_coach_cache";
-interface Cache { date: string; data: CoachResponse; }
+interface Cache {
+  fingerprint: string;
+  generatedAt: string; // ISO
+  data: CoachResponse;
+}
+
+/** Stable fingerprint of the inputs the Coach actually consumes.
+ *  When this string changes, cached coaching is stale and we offer a refresh. */
+function buildFingerprint(habits: Habit[], moods: MoodEntry[]): string {
+  const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0];
+  const h = habits
+    .map((x) => {
+      const recent = x.completedDates.filter((d) => d >= cutoff).sort();
+      return [x.id, x.name, x.worldType, x.streak, recent.join(",")].join("|");
+    })
+    .sort()
+    .join(";");
+  const m = moods
+    .filter((x) => x.date >= cutoff)
+    .map((x) => `${x.date}:${x.mood}`)
+    .sort()
+    .join(",");
+  return `${today}::${h}::${m}`;
+}
 
 function loadCache(): Cache | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as Cache) : null;
-  } catch { return null; }
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Migrate legacy `{ date, data }` cache entries — treat as stale.
+    if (!parsed?.fingerprint) return null;
+    return parsed as Cache;
+  } catch {
+    return null;
+  }
 }
 
 export default function Coach() {
-  const todayKey = new Date().toISOString().split("T")[0];
-  const cached = loadCache();
-  const initial = cached?.date === todayKey ? cached.data : null;
-
-  const [data, setData] = useState<CoachResponse | null>(initial);
+  const cached = useMemo(loadCache, []);
+  const [data, setData] = useState<CoachResponse | null>(cached?.data ?? null);
+  const [cachedFingerprint, setCachedFingerprint] = useState<string | null>(
+    cached?.fingerprint ?? null,
+  );
+  const [currentFingerprint, setCurrentFingerprint] = useState<string>(() =>
+    buildFingerprint(getHabits(), getMoods()),
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Re-check the fingerprint whenever the page becomes visible or storage changes.
+  // This catches habit toggles done on Dashboard while Coach was open.
+  useEffect(() => {
+    const recompute = () => setCurrentFingerprint(buildFingerprint(getHabits(), getMoods()));
+    const onVisibility = () => { if (!document.hidden) recompute(); };
+    window.addEventListener("focus", recompute);
+    window.addEventListener("storage", recompute);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", recompute);
+      window.removeEventListener("storage", recompute);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
+  const isStale =
+    !!data && cachedFingerprint !== null && cachedFingerprint !== currentFingerprint;
 
   async function fetchCoach() {
     setLoading(true);
@@ -85,8 +137,16 @@ export default function Coach() {
       if ((resp as { error?: string })?.error) throw new Error((resp as { error: string }).error);
 
       const next = resp as CoachResponse;
+      const fingerprint = buildFingerprint(habits, moods);
+      const cache: Cache = {
+        fingerprint,
+        generatedAt: new Date().toISOString(),
+        data: next,
+      };
       setData(next);
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ date: todayKey, data: next }));
+      setCachedFingerprint(fingerprint);
+      setCurrentFingerprint(fingerprint);
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "The Coach could not be reached.";
       setError(msg);
@@ -170,6 +230,18 @@ export default function Coach() {
 
         {data && !loading && (
           <div className="space-y-4">
+            {isStale && (
+              <button
+                onClick={fetchCoach}
+                className="w-full flex items-center gap-2 rounded-xl border border-accent/50 bg-accent/10 px-3 py-2 text-left hover:bg-accent/15 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4 text-rune shrink-0" />
+                <span className="text-xs text-muted-foreground flex-1">
+                  Your habits or moods have shifted — refresh for new counsel.
+                </span>
+                <span className="text-xs font-medium text-rune">Refresh</span>
+              </button>
+            )}
             <div>
               <p className="font-display text-lg leading-snug text-gradient-forest">
                 {data.headline}
