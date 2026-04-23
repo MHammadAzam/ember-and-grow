@@ -1,11 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { Home, Globe2, Sparkles, BarChart3, Settings } from "lucide-react";
+import { Home, Globe2, Wand2, BarChart3, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: "/dashboard",  label: "Home",   Icon: Home },
   { to: "/world",      label: "World",  Icon: Globe2 },
-  { to: "/quests",     label: "Quests", Icon: Sparkles },
+  { to: "/coach",      label: "Coach",  Icon: Wand2 },
   { to: "/stats",      label: "Stats",  Icon: BarChart3 },
   { to: "/settings",   label: "Settings", Icon: Settings },
 ];
