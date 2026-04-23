@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import World from "./pages/World";
 import Quests from "./pages/Quests";
+import Coach from "./pages/Coach";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/world" element={<World />} />
             <Route path="/quests" element={<Quests />} />
+            <Route path="/coach" element={<Coach />} />
             <Route path="/stats" element={<Stats />} />
             <Route path="/settings" element={<Settings />} />
           </Route>

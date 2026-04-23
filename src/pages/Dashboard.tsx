@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Sparkles, Shield } from "lucide-react";
+import { Plus, Sparkles, Shield, Scroll } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HabitCard from "@/components/HabitCard";
 import AddHabitDialog from "@/components/AddHabitDialog";
@@ -156,6 +157,19 @@ export default function Dashboard() {
 
       {/* Mood */}
       <MoodSelector />
+
+      {/* Daily quests link */}
+      <Link
+        to="/quests"
+        className="glass-card rounded-2xl p-3 px-4 flex items-center gap-3 hover:border-accent/60 transition-colors"
+      >
+        <Scroll className="w-5 h-5 text-rune" />
+        <div className="flex-1">
+          <p className="font-display text-sm">Daily Quests await</p>
+          <p className="text-[11px] text-muted-foreground">Bonus XP for completing today's challenges</p>
+        </div>
+        <span className="text-muted-foreground">→</span>
+      </Link>
 
       {/* Habit list */}
       <div className="space-y-3">
