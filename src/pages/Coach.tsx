@@ -230,6 +230,18 @@ export default function Coach() {
 
         {data && !loading && (
           <div className="space-y-4">
+            {isStale && (
+              <button
+                onClick={fetchCoach}
+                className="w-full flex items-center gap-2 rounded-xl border border-accent/50 bg-accent/10 px-3 py-2 text-left hover:bg-accent/15 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4 text-rune shrink-0" />
+                <span className="text-xs text-muted-foreground flex-1">
+                  Your habits or moods have shifted — refresh for new counsel.
+                </span>
+                <span className="text-xs font-medium text-rune">Refresh</span>
+              </button>
+            )}
             <div>
               <p className="font-display text-lg leading-snug text-gradient-forest">
                 {data.headline}
