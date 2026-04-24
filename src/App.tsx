@@ -10,6 +10,11 @@ import Quests from "./pages/Quests";
 import Coach from "./pages/Coach";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
+import Focus from "./pages/Focus";
+import Bets from "./pages/Bets";
+import FutureSelf from "./pages/FutureSelf";
+import AlterEgoPage from "./pages/AlterEgo";
+import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
 import AppShell from "./components/AppShell";
 
