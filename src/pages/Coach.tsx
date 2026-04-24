@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, Plus, Compass, AlertCircle, RefreshCw } from "lucide-react";
+import { Sparkles, Wand2, Plus, Compass, AlertCircle, RefreshCw, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -13,6 +13,7 @@ import {
   type Habit,
   type MoodEntry,
 } from "@/lib/habitStore";
+import { useSpeech } from "@/hooks/useSpeech";
 import { toast } from "sonner";
 
 interface CoachInsight {
