@@ -35,6 +35,11 @@ const App = () => (
             <Route path="/coach" element={<Coach />} />
             <Route path="/stats" element={<Stats />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/focus" element={<Focus />} />
+            <Route path="/bets" element={<Bets />} />
+            <Route path="/future" element={<FutureSelf />} />
+            <Route path="/alter-ego" element={<AlterEgoPage />} />
+            <Route path="/journal" element={<Journal />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
