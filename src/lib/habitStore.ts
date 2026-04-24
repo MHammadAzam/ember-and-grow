@@ -147,11 +147,12 @@ export function saveProfile(profile: UserProfile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
 }
 
-/** Award XP, recompute level (cap 100) and badges. Returns the updated profile. */
+/** Award XP, recompute level (cap 100) and badges. Returns the updated profile.
+ *  Negative amounts are allowed (bets/spends) but xp is clamped at 0 and level never drops. */
 export function addXP(amount: number): UserProfile {
   const profile = getProfile();
-  profile.xp += amount;
-  const newLevel = Math.min(100, Math.floor(profile.xp / 100) + 1);
+  profile.xp = Math.max(0, profile.xp + amount);
+  const newLevel = Math.min(100, Math.max(1, Math.floor(profile.xp / 100) + 1));
   if (newLevel > profile.level) profile.level = newLevel;
   profile.title = titleForLevel(profile.level);
 
