@@ -244,10 +244,27 @@ export default function Coach() {
                 <span className="text-xs font-medium text-rune">Refresh</span>
               </button>
             )}
-            <div>
-              <p className="font-display text-lg leading-snug text-gradient-forest">
+            <div className="flex items-start gap-2">
+              <p className="font-display text-lg leading-snug text-gradient-forest flex-1">
                 {data.headline}
               </p>
+              {speechSupported && (
+                <button
+                  onClick={() => {
+                    if (speaking) { stop(); return; }
+                    const script = [
+                      data.headline,
+                      ...data.insights.map((i) => `${i.title}. ${i.body}`),
+                      `Today's focus: ${data.focusAction}`,
+                    ].join(" ... ");
+                    speak(script);
+                  }}
+                  title={speaking ? "Stop voice" : "Hear the Sage speak"}
+                  className="shrink-0 w-9 h-9 rounded-full border border-accent/40 bg-card/60 hover:bg-card flex items-center justify-center text-rune transition-colors"
+                >
+                  {speaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+              )}
             </div>
 
             <div className="space-y-2.5">
