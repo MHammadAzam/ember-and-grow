@@ -80,6 +80,7 @@ export default function Coach() {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { speak, stop, speaking, supported: speechSupported } = useSpeech();
 
   // Re-check the fingerprint whenever the page becomes visible or storage changes.
   // This catches habit toggles done on Dashboard while Coach was open.
