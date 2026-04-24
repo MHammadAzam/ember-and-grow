@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Wand2, Plus, Compass, AlertCircle, RefreshCw } from "lucide-react";
+import { Sparkles, Wand2, Plus, Compass, AlertCircle, RefreshCw, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -13,6 +13,7 @@ import {
   type Habit,
   type MoodEntry,
 } from "@/lib/habitStore";
+import { useSpeech } from "@/hooks/useSpeech";
 import { toast } from "sonner";
 
 interface CoachInsight {
@@ -79,6 +80,7 @@ export default function Coach() {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { speak, stop, speaking, supported: speechSupported } = useSpeech();
 
   // Re-check the fingerprint whenever the page becomes visible or storage changes.
   // This catches habit toggles done on Dashboard while Coach was open.
@@ -242,10 +244,27 @@ export default function Coach() {
                 <span className="text-xs font-medium text-rune">Refresh</span>
               </button>
             )}
-            <div>
-              <p className="font-display text-lg leading-snug text-gradient-forest">
+            <div className="flex items-start gap-2">
+              <p className="font-display text-lg leading-snug text-gradient-forest flex-1">
                 {data.headline}
               </p>
+              {speechSupported && (
+                <button
+                  onClick={() => {
+                    if (speaking) { stop(); return; }
+                    const script = [
+                      data.headline,
+                      ...data.insights.map((i) => `${i.title}. ${i.body}`),
+                      `Today's focus: ${data.focusAction}`,
+                    ].join(" ... ");
+                    speak(script);
+                  }}
+                  title={speaking ? "Stop voice" : "Hear the Sage speak"}
+                  className="shrink-0 w-9 h-9 rounded-full border border-accent/40 bg-card/60 hover:bg-card flex items-center justify-center text-rune transition-colors"
+                >
+                  {speaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </button>
+              )}
             </div>
 
             <div className="space-y-2.5">

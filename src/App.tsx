@@ -10,6 +10,11 @@ import Quests from "./pages/Quests";
 import Coach from "./pages/Coach";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
+import Focus from "./pages/Focus";
+import Bets from "./pages/Bets";
+import FutureSelf from "./pages/FutureSelf";
+import AlterEgoPage from "./pages/AlterEgo";
+import Journal from "./pages/Journal";
 import NotFound from "./pages/NotFound";
 import AppShell from "./components/AppShell";
 
@@ -30,6 +35,11 @@ const App = () => (
             <Route path="/coach" element={<Coach />} />
             <Route path="/stats" element={<Stats />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/focus" element={<Focus />} />
+            <Route path="/bets" element={<Bets />} />
+            <Route path="/future" element={<FutureSelf />} />
+            <Route path="/alter-ego" element={<AlterEgoPage />} />
+            <Route path="/journal" element={<Journal />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

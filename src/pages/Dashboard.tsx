@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Sparkles, Shield, Scroll } from "lucide-react";
+import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HabitCard from "@/components/HabitCard";
 import AddHabitDialog from "@/components/AddHabitDialog";
@@ -11,6 +11,7 @@ import confetti from "canvas-confetti";
 import {
   Habit, getHabits, saveHabits, getProfile, getTodayKey, getMonthKey,
   calculateStreak, addXP, getDailyQuote, isCompletedToday, HABIT_COLORS,
+  getAlterEgo,
 } from "@/lib/habitStore";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>(getHabits);
   const [profile, setProfile] = useState(getProfile);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const ego = getAlterEgo();
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   const todayCompleted = habits.filter(isCompletedToday).length;
@@ -158,18 +160,48 @@ export default function Dashboard() {
       {/* Mood */}
       <MoodSelector />
 
-      {/* Daily quests link */}
-      <Link
-        to="/quests"
-        className="glass-card rounded-2xl p-3 px-4 flex items-center gap-3 hover:border-accent/60 transition-colors"
-      >
-        <Scroll className="w-5 h-5 text-rune" />
-        <div className="flex-1">
-          <p className="font-display text-sm">Daily Quests await</p>
-          <p className="text-[11px] text-muted-foreground">Bonus XP for completing today's challenges</p>
+      {/* Alter-ego nudge */}
+      {ego && (
+        <Link
+          to="/alter-ego"
+          className="glass-card rounded-2xl p-3 px-4 flex items-center gap-3 border-accent/40 hover:border-accent/70 transition-colors"
+        >
+          <span className="text-lg">🜂</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              What would {ego.name} do?
+            </p>
+            <p className="text-sm italic truncate">"{ego.mantra}"</p>
+          </div>
+        </Link>
+      )}
+
+      {/* Forge tools — quick access to advanced features */}
+      <div>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 px-1">
+          Forge tools
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { to: "/quests", label: "Quests", Icon: Scroll, hint: "Daily" },
+            { to: "/focus", label: "Focus", Icon: Timer, hint: "25–60m" },
+            { to: "/bets", label: "Bets", Icon: Coins, hint: "Stake XP" },
+            { to: "/future", label: "Future", Icon: Eye, hint: "Oracle" },
+            { to: "/alter-ego", label: "Alter Ego", Icon: Drama, hint: "Identity" },
+            { to: "/journal", label: "Journal", Icon: Video, hint: "Record" },
+          ].map(({ to, label, Icon, hint }) => (
+            <Link
+              key={to}
+              to={to}
+              className="glass-card-hover rounded-xl p-3 flex flex-col items-center text-center gap-1 group"
+            >
+              <Icon className="w-5 h-5 text-rune group-hover:scale-110 transition-transform" />
+              <span className="text-xs font-medium leading-tight">{label}</span>
+              <span className="text-[10px] text-muted-foreground">{hint}</span>
+            </Link>
+          ))}
         </div>
-        <span className="text-muted-foreground">→</span>
-      </Link>
+      </div>
 
       {/* Habit list */}
       <div className="space-y-3">
