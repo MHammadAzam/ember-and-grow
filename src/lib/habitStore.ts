@@ -273,3 +273,126 @@ export const AI_HABIT_SUGGESTIONS = [
   { name: "Practice Gratitude",       icon: "🙏", reason: "Heals the heart" },
   { name: "Digital Detox Hour",       icon: "📵", reason: "Shields from distraction" },
 ];
+
+// ---------- Habit Bets ----------
+export interface HabitBet {
+  id: string;
+  habitId: string;
+  habitName: string;
+  habitIcon: string;
+  stake: number;          // XP staked
+  payout: number;         // XP paid on win (2x stake)
+  startDate: string;      // YYYY-MM-DD
+  endDate: string;        // YYYY-MM-DD (inclusive)
+  requiredCompletions: number;
+  status: "active" | "won" | "lost";
+  resolvedAt?: string;
+}
+
+export function getBets(): HabitBet[] {
+  const raw = localStorage.getItem(BETS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+export function saveBets(bets: HabitBet[]) {
+  localStorage.setItem(BETS_KEY, JSON.stringify(bets));
+}
+
+/** Resolve any active bets whose endDate has passed. Returns updated list + XP delta. */
+export function resolveExpiredBets(habits: Habit[]): { bets: HabitBet[]; xpDelta: number; resolved: HabitBet[] } {
+  const today = getTodayKey();
+  const bets = getBets();
+  let xpDelta = 0;
+  const resolved: HabitBet[] = [];
+  const next = bets.map((b) => {
+    if (b.status !== "active") return b;
+    if (b.endDate >= today) return b;
+    const habit = habits.find((h) => h.id === b.habitId);
+    const completions = habit
+      ? habit.completedDates.filter((d) => d >= b.startDate && d <= b.endDate).length
+      : 0;
+    const won = completions >= b.requiredCompletions;
+    const r: HabitBet = { ...b, status: won ? "won" : "lost", resolvedAt: today };
+    if (won) xpDelta += b.payout;
+    resolved.push(r);
+    return r;
+  });
+  if (resolved.length > 0) saveBets(next);
+  return { bets: next, xpDelta, resolved };
+}
+
+// ---------- Focus Sessions ----------
+export interface FocusSession {
+  id: string;
+  startedAt: string;       // ISO
+  durationMin: number;     // planned
+  completedMin: number;    // actual
+  habitId?: string;
+  completed: boolean;
+}
+export function getFocusSessions(): FocusSession[] {
+  const raw = localStorage.getItem(FOCUS_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+export function logFocusSession(s: FocusSession) {
+  const all = getFocusSessions();
+  localStorage.setItem(FOCUS_KEY, JSON.stringify([s, ...all].slice(0, 100)));
+}
+export function focusSessionsToday(): FocusSession[] {
+  const today = getTodayKey();
+  return getFocusSessions().filter((s) => s.startedAt.startsWith(today));
+}
+
+// ---------- Future Self ----------
+export interface FutureSelfLetter {
+  id: string;
+  createdAt: string;
+  horizonDays: number;
+  letter: string;
+  bestFuture?: string;
+  worstFuture?: string;
+}
+export function getFutureLetters(): FutureSelfLetter[] {
+  const raw = localStorage.getItem(FUTURE_SELF_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+export function saveFutureLetters(items: FutureSelfLetter[]) {
+  localStorage.setItem(FUTURE_SELF_KEY, JSON.stringify(items));
+}
+
+// ---------- Alter Ego ----------
+export interface AlterEgo {
+  name: string;
+  archetype: string;
+  values: string[];
+  mantra: string;
+  createdAt: string;
+}
+export function getAlterEgo(): AlterEgo | null {
+  const raw = localStorage.getItem(ALTER_EGO_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+export function saveAlterEgo(ego: AlterEgo | null) {
+  if (ego) localStorage.setItem(ALTER_EGO_KEY, JSON.stringify(ego));
+  else localStorage.removeItem(ALTER_EGO_KEY);
+}
+
+// ---------- Video Journal (IndexedDB-backed) ----------
+// Lightweight INDEX in localStorage; actual video Blobs live in IndexedDB.
+export interface JournalEntry {
+  id: string;
+  createdAt: string;
+  durationSec: number;
+  note?: string;
+  mood?: Mood;
+  blobKey: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+export function getJournalIndex(): JournalEntry[] {
+  const raw = localStorage.getItem(JOURNAL_INDEX_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+export function saveJournalIndex(items: JournalEntry[]) {
+  localStorage.setItem(JOURNAL_INDEX_KEY, JSON.stringify(items));
+}
+
