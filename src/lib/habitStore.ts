@@ -46,6 +46,11 @@ const HABITS_KEY = "lifeforge_habits";
 const PROFILE_KEY = "lifeforge_profile";
 const MOOD_KEY = "lifeforge_moods";
 const QUESTS_KEY = "lifeforge_quests";
+const BETS_KEY = "lifeforge_bets";
+const FOCUS_KEY = "lifeforge_focus_sessions";
+const FUTURE_SELF_KEY = "lifeforge_future_self";
+const ALTER_EGO_KEY = "lifeforge_alter_ego";
+const JOURNAL_INDEX_KEY = "lifeforge_journal_index";
 
 const ICONS = ["🏃", "📚", "💧", "🧘", "✍️", "🎵", "💪", "🥗", "😴", "🧠", "🎯", "💻", "🌿", "🔥", "⚔️", "🪄"];
 // HSL component strings — pair with `hsl(${color})` in styles
