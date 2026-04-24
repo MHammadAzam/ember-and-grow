@@ -160,6 +160,22 @@ export default function Dashboard() {
       {/* Mood */}
       <MoodSelector />
 
+      {/* Alter-ego nudge */}
+      {ego && (
+        <Link
+          to="/alter-ego"
+          className="glass-card rounded-2xl p-3 px-4 flex items-center gap-3 border-accent/40 hover:border-accent/70 transition-colors"
+        >
+          <span className="text-lg">🜂</span>
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+              What would {ego.name} do?
+            </p>
+            <p className="text-sm italic truncate">"{ego.mantra}"</p>
+          </div>
+        </Link>
+      )}
+
       {/* Forge tools — quick access to advanced features */}
       <div>
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 px-1">
