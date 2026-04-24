@@ -11,6 +11,7 @@ import confetti from "canvas-confetti";
 import {
   Habit, getHabits, saveHabits, getProfile, getTodayKey, getMonthKey,
   calculateStreak, addXP, getDailyQuote, isCompletedToday, HABIT_COLORS,
+  getAlterEgo,
 } from "@/lib/habitStore";
 import { toast } from "sonner";
 
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>(getHabits);
   const [profile, setProfile] = useState(getProfile);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const ego = getAlterEgo();
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   const todayCompleted = habits.filter(isCompletedToday).length;
