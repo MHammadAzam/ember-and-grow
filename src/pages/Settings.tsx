@@ -1,18 +1,26 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Moon, Sun, Download, Upload, Trash2 } from "lucide-react";
+import { Moon, Sun, Download, Upload, Trash2, Crown, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Link } from "react-router-dom";
 import { getProfile, saveProfile } from "@/lib/habitStore";
 import { useTheme } from "@/hooks/useTheme";
+import { usePremium } from "@/hooks/usePremium";
+import { setAdminEmail } from "@/lib/premium";
+import { hasPin, setPin, clearPin } from "@/lib/appLock";
 import { toast } from "sonner";
 
 export default function Settings() {
   const [profile, setProfileState] = useState(getProfile);
   const [name, setName] = useState(profile.name);
   const { dark, setDark } = useTheme();
+  const premium = usePremium();
+  const [email, setEmail] = useState(premium.email ?? "");
+  const [pinValue, setPinValue] = useState("");
+  const [pinSet, setPinSet] = useState<boolean>(hasPin);
 
   const saveName = () => {
     const next = { ...profile, name: name.trim() || "Adventurer" };
@@ -21,12 +29,36 @@ export default function Settings() {
     toast.success("Profile updated");
   };
 
+  const saveEmail = () => {
+    setAdminEmail(email.trim() || undefined);
+    toast.success("Account updated");
+  };
+
+  const savePin = () => {
+    try {
+      setPin(pinValue);
+      setPinSet(true);
+      setPinValue("");
+      toast.success("PIN set — app will lock on next visit");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to set PIN");
+    }
+  };
+
+  const removePin = () => {
+    clearPin();
+    setPinSet(false);
+    toast.success("PIN removed");
+  };
+
   const exportData = () => {
     const data = {
       habits: localStorage.getItem("lifeforge_habits"),
       profile: localStorage.getItem("lifeforge_profile"),
       moods: localStorage.getItem("lifeforge_moods"),
       quests: localStorage.getItem("lifeforge_quests"),
+      premium: localStorage.getItem("lifeforge_premium"),
+      reward: localStorage.getItem("lifeforge_daily_reward"),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -46,6 +78,8 @@ export default function Settings() {
       if (data.profile) localStorage.setItem("lifeforge_profile", data.profile);
       if (data.moods)   localStorage.setItem("lifeforge_moods", data.moods);
       if (data.quests)  localStorage.setItem("lifeforge_quests", data.quests);
+      if (data.premium) localStorage.setItem("lifeforge_premium", data.premium);
+      if (data.reward)  localStorage.setItem("lifeforge_daily_reward", data.reward);
       toast.success("Restored — reloading…");
       setTimeout(() => window.location.reload(), 600);
     } catch {
@@ -74,6 +108,38 @@ export default function Settings() {
         </p>
       </motion.div>
 
+      {/* Account / membership */}
+      <div className="glass-card rounded-2xl p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-display text-lg">Account</p>
+          {premium.unlocked && (
+            <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-primary/40 bg-primary/10 text-primary flex items-center gap-1">
+              <Crown className="w-3 h-3" /> {premium.isAdmin ? "Admin" : "Premium"}
+            </span>
+          )}
+        </div>
+        <div>
+          <Label>Email (optional)</Label>
+          <div className="flex gap-2 mt-1.5">
+            <Input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            <Button onClick={saveEmail}>Save</Button>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Used for backup labelling. Saved on this device only.
+          </p>
+        </div>
+        {!premium.unlocked && (
+          <Button asChild variant="outline" className="w-full gap-2">
+            <Link to="/premium"><Crown className="w-4 h-4" /> Upgrade to Premium</Link>
+          </Button>
+        )}
+      </div>
+
       {/* Profile */}
       <div className="glass-card rounded-2xl p-5 space-y-3">
         <p className="font-display text-lg">Profile</p>
@@ -99,6 +165,41 @@ export default function Settings() {
           </div>
         </div>
         <Switch checked={dark} onCheckedChange={setDark} />
+      </div>
+
+      {/* App lock (premium) */}
+      <div className="glass-card rounded-2xl p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-display text-lg flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-rune" /> App lock (PIN)
+          </p>
+          {!premium.unlocked && (
+            <Link to="/premium" className="text-[11px] text-rune flex items-center gap-1">
+              <Lock className="w-3 h-3" /> Premium
+            </Link>
+          )}
+        </div>
+        {premium.unlocked ? (
+          pinSet ? (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">PIN is set. The app will lock on each session.</p>
+              <Button variant="outline" onClick={removePin}>Remove</Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                type="password"
+                inputMode="numeric"
+                placeholder="4–8 digits"
+                value={pinValue}
+                onChange={e => setPinValue(e.target.value.replace(/\D/g, "").slice(0, 8))}
+              />
+              <Button onClick={savePin} disabled={pinValue.length < 4}>Set PIN</Button>
+            </div>
+          )
+        ) : (
+          <p className="text-sm text-muted-foreground">Unlock Premium to protect your saga with a PIN.</p>
+        )}
       </div>
 
       {/* Backup */}

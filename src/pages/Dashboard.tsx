@@ -1,18 +1,21 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video } from "lucide-react";
+import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video, Trophy, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HabitCard from "@/components/HabitCard";
 import AddHabitDialog from "@/components/AddHabitDialog";
 import AISuggestions from "@/components/AISuggestions";
 import MoodSelector from "@/components/MoodSelector";
+import DailyRewardCard from "@/components/DailyRewardCard";
 import confetti from "canvas-confetti";
 import {
   Habit, getHabits, saveHabits, getProfile, getTodayKey, getMonthKey,
   calculateStreak, addXP, getDailyQuote, isCompletedToday, HABIT_COLORS,
   getAlterEgo,
 } from "@/lib/habitStore";
+import { usePremium } from "@/hooks/usePremium";
+import { FREE_HABIT_LIMIT } from "@/lib/premium";
 import { toast } from "sonner";
 
 export default function Dashboard() {
@@ -21,6 +24,21 @@ export default function Dashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const ego = getAlterEgo();
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const { unlocked: premium } = usePremium();
+  const navigate = useNavigate();
+
+  const atFreeLimit = !premium && habits.length >= FREE_HABIT_LIMIT;
+
+  const tryOpenAdd = () => {
+    if (atFreeLimit) {
+      toast(`Free plan limit (${FREE_HABIT_LIMIT} habits). Unlock Premium for unlimited.`, {
+        action: { label: "Upgrade", onClick: () => navigate("/premium") },
+      });
+      return;
+    }
+    setEditingHabit(null);
+    setDialogOpen(true);
+  };
 
   const todayCompleted = habits.filter(isCompletedToday).length;
   const totalHabits = habits.length;
@@ -77,6 +95,12 @@ export default function Dashboard() {
       setHabits(prev => prev.map(h => h.id === editingHabit.id ? { ...h, ...data } : h));
       setEditingHabit(null);
     } else {
+      if (!premium && habits.length >= FREE_HABIT_LIMIT) {
+        toast(`Free plan limit (${FREE_HABIT_LIMIT} habits). Unlock Premium for unlimited.`, {
+          action: { label: "Upgrade", onClick: () => navigate("/premium") },
+        });
+        return;
+      }
       const newHabit: Habit = {
         ...data,
         id: crypto.randomUUID(),
@@ -86,9 +110,15 @@ export default function Dashboard() {
       };
       setHabits(prev => [...prev, newHabit]);
     }
-  }, [editingHabit]);
+  }, [editingHabit, premium, habits.length, navigate]);
 
   const handleQuickAdd = useCallback((name: string, icon: string) => {
+    if (!premium && habits.length >= FREE_HABIT_LIMIT) {
+      toast(`Free plan limit (${FREE_HABIT_LIMIT} habits). Unlock Premium for unlimited.`, {
+        action: { label: "Upgrade", onClick: () => navigate("/premium") },
+      });
+      return;
+    }
     const newHabit: Habit = {
       id: crypto.randomUUID(), name, icon,
       color: HABIT_COLORS[Math.floor(Math.random() * HABIT_COLORS.length)],
@@ -96,7 +126,7 @@ export default function Dashboard() {
       streak: 0, completedDates: [], createdAt: new Date().toISOString(),
     };
     setHabits(prev => [...prev, newHabit]);
-  }, []);
+  }, [premium, habits.length, navigate]);
 
   const deleteHabit = useCallback((id: string) => {
     setHabits(prev => prev.filter(h => h.id !== id));
@@ -150,12 +180,30 @@ export default function Dashboard() {
         )}
         <Button
           size="sm"
-          onClick={() => { setEditingHabit(null); setDialogOpen(true); }}
+          onClick={tryOpenAdd}
           className="gap-1.5"
         >
           <Plus className="w-4 h-4" /> Add
         </Button>
       </motion.div>
+
+      {/* Daily reward */}
+      <DailyRewardCard onClaimed={() => setProfile(getProfile())} />
+
+      {/* Free-tier limit hint */}
+      {!premium && habits.length >= FREE_HABIT_LIMIT && (
+        <Link
+          to="/premium"
+          className="glass-card rounded-2xl p-3 px-4 flex items-center gap-3 border-accent/40 hover:border-accent/70 transition-colors"
+        >
+          <Lock className="w-4 h-4 text-rune" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Free plan</p>
+            <p className="text-sm">You've reached {FREE_HABIT_LIMIT} habits — upgrade for unlimited.</p>
+          </div>
+          <Crown className="w-4 h-4 text-rune" />
+        </Link>
+      )}
 
       {/* Mood */}
       <MoodSelector />
@@ -184,11 +232,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-3 gap-2">
           {[
             { to: "/quests", label: "Quests", Icon: Scroll, hint: "Daily" },
-            { to: "/focus", label: "Focus", Icon: Timer, hint: "25–60m" },
+            { to: "/focus", label: "Focus", Icon: Timer, hint: "30m–2h" },
             { to: "/bets", label: "Bets", Icon: Coins, hint: "Stake XP" },
             { to: "/future", label: "Future", Icon: Eye, hint: "Oracle" },
             { to: "/alter-ego", label: "Alter Ego", Icon: Drama, hint: "Identity" },
             { to: "/journal", label: "Journal", Icon: Video, hint: "Record" },
+            { to: "/achievements", label: "Badges", Icon: Trophy, hint: "Forge feats" },
+            { to: "/premium", label: "Premium", Icon: Crown, hint: premium ? "Active" : "Unlock" },
           ].map(({ to, label, Icon, hint }) => (
             <Link
               key={to}
@@ -237,7 +287,7 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground mt-1 mb-4">
             Forge your first habit and watch your world come alive.
           </p>
-          <Button onClick={() => setDialogOpen(true)} className="gap-1.5">
+          <Button onClick={tryOpenAdd} className="gap-1.5">
             <Plus className="w-4 h-4" /> Forge First Habit
           </Button>
         </div>
