@@ -15,6 +15,8 @@ import Bets from "./pages/Bets";
 import FutureSelf from "./pages/FutureSelf";
 import AlterEgoPage from "./pages/AlterEgo";
 import Journal from "./pages/Journal";
+import Premium from "./pages/Premium";
+import Achievements from "./pages/Achievements";
 import NotFound from "./pages/NotFound";
 import AppShell from "./components/AppShell";
 
@@ -40,6 +42,8 @@ const App = () => (
             <Route path="/future" element={<FutureSelf />} />
             <Route path="/alter-ego" element={<AlterEgoPage />} />
             <Route path="/journal" element={<Journal />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/achievements" element={<Achievements />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
