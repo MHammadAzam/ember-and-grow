@@ -1,18 +1,21 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video } from "lucide-react";
+import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video, Trophy, Crown, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HabitCard from "@/components/HabitCard";
 import AddHabitDialog from "@/components/AddHabitDialog";
 import AISuggestions from "@/components/AISuggestions";
 import MoodSelector from "@/components/MoodSelector";
+import DailyRewardCard from "@/components/DailyRewardCard";
 import confetti from "canvas-confetti";
 import {
   Habit, getHabits, saveHabits, getProfile, getTodayKey, getMonthKey,
   calculateStreak, addXP, getDailyQuote, isCompletedToday, HABIT_COLORS,
   getAlterEgo,
 } from "@/lib/habitStore";
+import { usePremium } from "@/hooks/usePremium";
+import { FREE_HABIT_LIMIT } from "@/lib/premium";
 import { toast } from "sonner";
 
 export default function Dashboard() {
