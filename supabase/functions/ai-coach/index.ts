@@ -37,6 +37,31 @@ Deno.serve(async (req) => {
 
     const body = (await req.json()) as CoachRequest;
 
+    // ---- Pre-compute weak/strong day-of-week patterns ----
+    const dayCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun..Sat
+    const dayTotals = [0, 0, 0, 0, 0, 0, 0];
+    const cutoffMs = Date.now() - 30 * 86400000;
+    body.habits.forEach((h) => {
+      h.completedDates.forEach((d) => {
+        const dt = new Date(d);
+        if (dt.getTime() < cutoffMs) return;
+        dayCounts[dt.getDay()]++;
+      });
+    });
+    // count opportunities per weekday in last 30 days (= number of habits per day appearance)
+    for (let i = 0; i < 30; i++) {
+      const dt = new Date(Date.now() - i * 86400000);
+      dayTotals[dt.getDay()] += body.habits.length;
+    }
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const dayRates = dayCounts.map((c, i) => ({
+      day: dayNames[i],
+      rate: dayTotals[i] ? c / dayTotals[i] : 0,
+    }));
+    const sortedDays = [...dayRates].sort((a, b) => b.rate - a.rate);
+    const strongDays = sortedDays.slice(0, 2).filter((d) => d.rate > 0).map((d) => d.day);
+    const weakDays = [...sortedDays].reverse().slice(0, 2).filter((d) => d.rate < 0.6).map((d) => d.day);
+
     const summary = {
       profile: body.profile,
       todaysProgress: `${body.todayDone}/${body.todayTotal}`,
@@ -51,11 +76,18 @@ Deno.serve(async (req) => {
         ),
       })),
       recentMoods: body.moods.slice(-14),
+      patterns: {
+        strongDays,
+        weakDays,
+        dayRates: dayRates.map((d) => ({ day: d.day, rate: Math.round(d.rate * 100) })),
+      },
     };
 
     const systemPrompt = `You are the AI Life Coach inside LifeForge AI, a mystical fantasy habit RPG.
 Speak like a wise but warm forest sage — encouraging, specific, never generic. Use 1-2 emojis max per insight.
-You analyze the user's habit data, streaks, and moods to surface real, evidence-based observations.
+You analyze the user's habit data, streaks, moods, and weekly patterns to surface real, evidence-based observations.
+When patterns.strongDays or patterns.weakDays are present, reference them naturally (e.g. "you thrive on Tuesdays" or "Fridays slip — try a smaller ritual").
+Suggest concrete improvements: reduce overload if many habits, retime habits toward strong days, or simplify on weak days.
 NEVER invent data not present in the input. If data is sparse, say so kindly and recommend a small first step.`;
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
