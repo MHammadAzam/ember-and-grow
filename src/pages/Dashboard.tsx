@@ -24,6 +24,21 @@ export default function Dashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const ego = getAlterEgo();
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const { unlocked: premium } = usePremium();
+  const navigate = useNavigate();
+
+  const atFreeLimit = !premium && habits.length >= FREE_HABIT_LIMIT;
+
+  const tryOpenAdd = () => {
+    if (atFreeLimit) {
+      toast(`Free plan limit (${FREE_HABIT_LIMIT} habits). Unlock Premium for unlimited.`, {
+        action: { label: "Upgrade", onClick: () => navigate("/premium") },
+      });
+      return;
+    }
+    setEditingHabit(null);
+    setDialogOpen(true);
+  };
 
   const todayCompleted = habits.filter(isCompletedToday).length;
   const totalHabits = habits.length;
