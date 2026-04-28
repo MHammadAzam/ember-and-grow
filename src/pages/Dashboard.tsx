@@ -287,7 +287,7 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground mt-1 mb-4">
             Forge your first habit and watch your world come alive.
           </p>
-          <Button onClick={() => setDialogOpen(true)} className="gap-1.5">
+          <Button onClick={tryOpenAdd} className="gap-1.5">
             <Plus className="w-4 h-4" /> Forge First Habit
           </Button>
         </div>
