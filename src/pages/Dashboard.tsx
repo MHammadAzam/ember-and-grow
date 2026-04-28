@@ -232,11 +232,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-3 gap-2">
           {[
             { to: "/quests", label: "Quests", Icon: Scroll, hint: "Daily" },
-            { to: "/focus", label: "Focus", Icon: Timer, hint: "25–60m" },
+            { to: "/focus", label: "Focus", Icon: Timer, hint: "30m–2h" },
             { to: "/bets", label: "Bets", Icon: Coins, hint: "Stake XP" },
             { to: "/future", label: "Future", Icon: Eye, hint: "Oracle" },
             { to: "/alter-ego", label: "Alter Ego", Icon: Drama, hint: "Identity" },
             { to: "/journal", label: "Journal", Icon: Video, hint: "Record" },
+            { to: "/achievements", label: "Badges", Icon: Trophy, hint: "Forge feats" },
+            { to: "/premium", label: "Premium", Icon: Crown, hint: premium ? "Active" : "Unlock" },
           ].map(({ to, label, Icon, hint }) => (
             <Link
               key={to}
