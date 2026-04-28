@@ -95,6 +95,12 @@ export default function Dashboard() {
       setHabits(prev => prev.map(h => h.id === editingHabit.id ? { ...h, ...data } : h));
       setEditingHabit(null);
     } else {
+      if (!premium && habits.length >= FREE_HABIT_LIMIT) {
+        toast(`Free plan limit (${FREE_HABIT_LIMIT} habits). Unlock Premium for unlimited.`, {
+          action: { label: "Upgrade", onClick: () => navigate("/premium") },
+        });
+        return;
+      }
       const newHabit: Habit = {
         ...data,
         id: crypto.randomUUID(),
@@ -104,9 +110,15 @@ export default function Dashboard() {
       };
       setHabits(prev => [...prev, newHabit]);
     }
-  }, [editingHabit]);
+  }, [editingHabit, premium, habits.length, navigate]);
 
   const handleQuickAdd = useCallback((name: string, icon: string) => {
+    if (!premium && habits.length >= FREE_HABIT_LIMIT) {
+      toast(`Free plan limit (${FREE_HABIT_LIMIT} habits). Unlock Premium for unlimited.`, {
+        action: { label: "Upgrade", onClick: () => navigate("/premium") },
+      });
+      return;
+    }
     const newHabit: Habit = {
       id: crypto.randomUUID(), name, icon,
       color: HABIT_COLORS[Math.floor(Math.random() * HABIT_COLORS.length)],
@@ -114,7 +126,7 @@ export default function Dashboard() {
       streak: 0, completedDates: [], createdAt: new Date().toISOString(),
     };
     setHabits(prev => [...prev, newHabit]);
-  }, []);
+  }, [premium, habits.length, navigate]);
 
   const deleteHabit = useCallback((id: string) => {
     setHabits(prev => prev.filter(h => h.id !== id));
