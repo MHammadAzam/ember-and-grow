@@ -180,12 +180,30 @@ export default function Dashboard() {
         )}
         <Button
           size="sm"
-          onClick={() => { setEditingHabit(null); setDialogOpen(true); }}
+          onClick={tryOpenAdd}
           className="gap-1.5"
         >
           <Plus className="w-4 h-4" /> Add
         </Button>
       </motion.div>
+
+      {/* Daily reward */}
+      <DailyRewardCard onClaimed={() => setProfile(getProfile())} />
+
+      {/* Free-tier limit hint */}
+      {!premium && habits.length >= FREE_HABIT_LIMIT && (
+        <Link
+          to="/premium"
+          className="glass-card rounded-2xl p-3 px-4 flex items-center gap-3 border-accent/40 hover:border-accent/70 transition-colors"
+        >
+          <Lock className="w-4 h-4 text-rune" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Free plan</p>
+            <p className="text-sm">You've reached {FREE_HABIT_LIMIT} habits — upgrade for unlimited.</p>
+          </div>
+          <Crown className="w-4 h-4 text-rune" />
+        </Link>
+      )}
 
       {/* Mood */}
       <MoodSelector />
