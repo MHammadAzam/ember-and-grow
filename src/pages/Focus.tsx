@@ -14,7 +14,11 @@ import { usePremium } from "@/hooks/usePremium";
 import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
 
-const PRESETS = [30, 60, 120] as const; // minutes
+const PRESETS = [
+  { min: 30,  label: "Light",  hint: "30 min" },
+  { min: 60,  label: "Deep",   hint: "1 hour" },
+  { min: 120, label: "Ultra",  hint: "2 hours" },
+] as const;
 const STATE_KEY = "lifeforge_focus_state";
 
 interface PersistedState {
