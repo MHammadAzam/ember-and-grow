@@ -389,6 +389,17 @@ export default function Focus() {
               {summary.xp > 0 && (
                 <p className="text-sm mt-1">+{summary.xp} XP added to your saga.</p>
               )}
+              {/* Productivity score */}
+              <div className="mt-4 rounded-xl border border-border p-3">
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Productivity score</p>
+                <p className="font-display text-3xl text-primary mt-0.5">{summary.productivity}</p>
+                <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-accent"
+                    style={{ width: `${summary.productivity}%` }}
+                  />
+                </div>
+              </div>
               <Button onClick={() => setSummary(null)} className="mt-4 w-full">Continue</Button>
             </motion.div>
           </motion.div>
