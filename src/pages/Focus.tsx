@@ -185,22 +185,23 @@ export default function Focus() {
         </div>
       </motion.div>
 
-      {/* Preset duration */}
-      <div className="flex gap-2">
-        {PRESETS.map((m) => (
+      {/* Preset duration — Light / Deep / Ultra */}
+      <div className="grid grid-cols-3 gap-2">
+        {PRESETS.map((p) => (
           <button
-            key={m}
+            key={p.min}
             disabled={running}
-            onClick={() => setDuration(m)}
+            onClick={() => setDuration(p.min)}
             className={cn(
-              "flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
-              duration === m
+              "rounded-xl border px-3 py-2.5 text-center transition-colors",
+              duration === p.min
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:text-foreground",
               running && "opacity-50 cursor-not-allowed",
             )}
           >
-            {m >= 60 ? `${m / 60} hour${m === 60 ? "" : "s"}` : `${m} min`}
+            <div className="font-display text-sm">{p.label}</div>
+            <div className="text-[11px] text-muted-foreground">{p.hint}</div>
           </button>
         ))}
       </div>
