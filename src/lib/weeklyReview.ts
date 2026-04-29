@@ -30,7 +30,7 @@ export function generateWeeklyReview(): WeeklyReview {
   const perHabit = habits.map((h) => {
     const hits = dates.filter((d) => h.completedDates.includes(d)).length;
     totalCompleted += hits;
-    return { name: h.name, icon: h.icon, rate: 7 ? hits / 7 : 0 };
+    return { name: h.name, icon: h.icon, rate: hits / 7 };
   });
 
   const sorted = [...perHabit].sort((a, b) => b.rate - a.rate);
