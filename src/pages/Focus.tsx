@@ -14,7 +14,11 @@ import { usePremium } from "@/hooks/usePremium";
 import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
 
-const PRESETS = [30, 60, 120] as const; // minutes
+const PRESETS = [
+  { min: 30,  label: "Light",  hint: "30 min" },
+  { min: 60,  label: "Deep",   hint: "1 hour" },
+  { min: 120, label: "Ultra",  hint: "2 hours" },
+] as const;
 const STATE_KEY = "lifeforge_focus_state";
 
 interface PersistedState {
@@ -64,7 +68,8 @@ export default function Focus() {
   const [today, setToday] = useState<FocusSession[]>(focusSessionsToday);
   const startedAtRef = useRef<string | null>(null);
   const [ambientKind, setAmbientKind] = useState<ambient.AmbientKind>("off");
-  const [summary, setSummary] = useState<{ minutes: number; xp: number; complete: boolean } | null>(null);
+  const [summary, setSummary] = useState<{ minutes: number; xp: number; complete: boolean; productivity: number } | null>(null);
+  const [immersive, setImmersive] = useState<boolean>(false);
   const habits = useMemo(() => getHabits(), []);
 
   // Reset remaining when duration changes (and not running)
@@ -101,6 +106,7 @@ export default function Focus() {
     const endsAt = Date.now() + remaining * 1000;
     saveState({ duration, habitId, endsAt });
     setRunning(true);
+    setImmersive(true); // enter distraction-free mode automatically
     if (premium && ambientKind !== "off") ambient.play(ambientKind);
   }
   function pause() {
@@ -117,6 +123,7 @@ export default function Focus() {
   }
   function finish(completed: boolean) {
     setRunning(false);
+    setImmersive(false);
     const startedAt = startedAtRef.current ?? new Date().toISOString();
     const completedMin = Math.round((duration * 60 - remaining) / 60) || (completed ? duration : 0);
     const minutes = completed ? duration : completedMin;
@@ -139,9 +146,13 @@ export default function Focus() {
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       toast.success(`Focus complete — +${xp} XP forged.`);
     } else {
-      toast("Session ended early — progress logged.");
+      toast(minutes > 0 ? `Session ended early — ${minutes} min logged.` : "Session ended.");
     }
-    setSummary({ minutes, xp, complete: completed });
+    // Productivity score: 0..100 based on % of planned time + ambient bonus
+    const ratio = duration > 0 ? Math.min(1, minutes / duration) : 0;
+    const ambientBonus = ambientKind !== "off" ? 5 : 0;
+    const productivity = Math.min(100, Math.round(ratio * 95 + ambientBonus));
+    setSummary({ minutes, xp, complete: completed, productivity });
     startedAtRef.current = null;
     setRemaining(duration * 60);
   }
@@ -181,22 +192,23 @@ export default function Focus() {
         </div>
       </motion.div>
 
-      {/* Preset duration */}
-      <div className="flex gap-2">
-        {PRESETS.map((m) => (
+      {/* Preset duration — Light / Deep / Ultra */}
+      <div className="grid grid-cols-3 gap-2">
+        {PRESETS.map((p) => (
           <button
-            key={m}
+            key={p.min}
             disabled={running}
-            onClick={() => setDuration(m)}
+            onClick={() => setDuration(p.min)}
             className={cn(
-              "flex-1 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
-              duration === m
+              "rounded-xl border px-3 py-2.5 text-center transition-colors",
+              duration === p.min
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border text-muted-foreground hover:text-foreground",
               running && "opacity-50 cursor-not-allowed",
             )}
           >
-            {m >= 60 ? `${m / 60} hour${m === 60 ? "" : "s"}` : `${m} min`}
+            <div className="font-display text-sm">{p.label}</div>
+            <div className="text-[11px] text-muted-foreground">{p.hint}</div>
           </button>
         ))}
       </div>
@@ -377,8 +389,72 @@ export default function Focus() {
               {summary.xp > 0 && (
                 <p className="text-sm mt-1">+{summary.xp} XP added to your saga.</p>
               )}
+              {/* Productivity score */}
+              <div className="mt-4 rounded-xl border border-border p-3">
+                <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Productivity score</p>
+                <p className="font-display text-3xl text-primary mt-0.5">{summary.productivity}</p>
+                <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-primary to-accent"
+                    style={{ width: `${summary.productivity}%` }}
+                  />
+                </div>
+              </div>
               <Button onClick={() => setSummary(null)} className="mt-4 w-full">Continue</Button>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Distraction-free Deep Focus overlay */}
+      <AnimatePresence>
+        {immersive && running && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex flex-col items-center justify-center"
+            style={{ background: "var(--gradient-mist)" }}
+          >
+            {/* Calming pulsating rings */}
+            <motion.div
+              aria-hidden
+              className="absolute w-[520px] h-[520px] rounded-full"
+              style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.18), transparent 65%)" }}
+              animate={{ scale: [1, 1.08, 1], opacity: [0.6, 0.85, 0.6] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              aria-hidden
+              className="absolute w-[300px] h-[300px] rounded-full"
+              style={{ background: "radial-gradient(circle, hsl(var(--accent) / 0.18), transparent 65%)" }}
+              animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            />
+
+            <button
+              onClick={() => setImmersive(false)}
+              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground text-xs flex items-center gap-1"
+              aria-label="Exit immersive mode"
+            >
+              <X className="w-4 h-4" /> Exit
+            </button>
+
+            <div className="relative text-center">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
+                Deep Focus
+              </p>
+              <p className="font-display text-7xl tabular-nums text-gradient-forest">{display}</p>
+              <p className="text-sm text-muted-foreground mt-2 italic">breathe. one task only.</p>
+              <div className="flex justify-center gap-3 mt-8">
+                <Button onClick={pause} variant="outline" className="gap-2">
+                  <Pause className="w-4 h-4" /> Pause
+                </Button>
+                <Button onClick={() => finish(false)} variant="ghost" className="gap-2">
+                  End early
+                </Button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

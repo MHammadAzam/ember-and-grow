@@ -1,13 +1,17 @@
 import { Outlet, Link } from "react-router-dom";
-import { Moon, Sun, Crown } from "lucide-react";
+import { Moon, Sun, Crown, WifiOff } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import PinGate from "@/components/PinGate";
 import { useTheme } from "@/hooks/useTheme";
+import { useThemeStore } from "@/hooks/useThemeStore";
+import { useOnline } from "@/hooks/useOnline";
 import { usePremium } from "@/hooks/usePremium";
 
 /** App shell for the authenticated/main routes. Provides top brand bar + bottom nav. */
 export default function AppShell() {
   const { dark, toggle } = useTheme();
+  useThemeStore(); // applies the active premium theme
+  const online = useOnline();
   const { unlocked: premium } = usePremium();
 
   return (
@@ -20,6 +24,14 @@ export default function AppShell() {
               <span className="text-gradient-forest">LifeForge AI</span>
             </Link>
             <div className="flex items-center gap-2">
+              {!online && (
+                <span
+                  title="Offline — your data is safe on this device"
+                  className="flex items-center gap-1 text-[10px] uppercase tracking-wider px-2 py-1 rounded-full border border-accent/40 bg-accent/10 text-rune"
+                >
+                  <WifiOff className="w-3 h-3" /> Offline
+                </span>
+              )}
               <Link
                 to="/premium"
                 aria-label="Premium"

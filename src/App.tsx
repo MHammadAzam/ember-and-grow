@@ -17,6 +17,9 @@ import AlterEgoPage from "./pages/AlterEgo";
 import Journal from "./pages/Journal";
 import Premium from "./pages/Premium";
 import Achievements from "./pages/Achievements";
+import Themes from "./pages/Themes";
+import Timeline from "./pages/Timeline";
+import WeeklyReview from "./pages/WeeklyReview";
 import NotFound from "./pages/NotFound";
 import AppShell from "./components/AppShell";
 
@@ -44,6 +47,9 @@ const App = () => (
             <Route path="/journal" element={<Journal />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/achievements" element={<Achievements />} />
+            <Route path="/themes" element={<Themes />} />
+            <Route path="/timeline" element={<Timeline />} />
+            <Route path="/weekly-review" element={<WeeklyReview />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
