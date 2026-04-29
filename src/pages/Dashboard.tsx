@@ -1,19 +1,23 @@
 import { useState, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video, Trophy, Crown, Lock } from "lucide-react";
+import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video, Trophy, Crown, Lock, Calendar, Palette, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HabitCard from "@/components/HabitCard";
 import AddHabitDialog from "@/components/AddHabitDialog";
 import AISuggestions from "@/components/AISuggestions";
 import MoodSelector from "@/components/MoodSelector";
 import DailyRewardCard from "@/components/DailyRewardCard";
+import LifeScoreCard from "@/components/LifeScoreCard";
+import BurnoutBanner from "@/components/BurnoutBanner";
+import SmartSchedulerCard from "@/components/SmartSchedulerCard";
 import confetti from "canvas-confetti";
 import {
   Habit, getHabits, saveHabits, getProfile, getTodayKey, getMonthKey,
   calculateStreak, addXP, getDailyQuote, isCompletedToday, HABIT_COLORS,
   getAlterEgo,
 } from "@/lib/habitStore";
+import { maybeRollSurprise } from "@/lib/surpriseReward";
 import { usePremium } from "@/hooks/usePremium";
 import { FREE_HABIT_LIMIT } from "@/lib/premium";
 import { toast } from "sonner";
@@ -66,6 +70,12 @@ export default function Dashboard() {
       if (before && !isCompletedToday(before)) {
         const p = addXP(10);
         setProfile(p);
+        // Surprise reward roll on positive completions only
+        const surprise = maybeRollSurprise();
+        if (surprise) {
+          toast.success(`✨ ${surprise.message} +${surprise.xp} XP · +${surprise.coins} coins`);
+          setProfile(getProfile());
+        }
       }
       return updated;
     });
