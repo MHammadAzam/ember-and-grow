@@ -221,7 +221,7 @@
     --rune: 40 20% 80%;
     --gradient-mist: linear-gradient(180deg, hsl(220 12% 12%), hsl(220 12% 9%));
   }
-
+}
 @layer base {
   * { @apply border-border; }
   html, body, #root { @apply h-full; }
