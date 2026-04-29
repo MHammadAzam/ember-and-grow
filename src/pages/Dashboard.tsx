@@ -197,6 +197,12 @@ export default function Dashboard() {
         </Button>
       </motion.div>
 
+      {/* Burnout / overwhelm advisory */}
+      <BurnoutBanner />
+
+      {/* Life Score — daily composite of consistency, today, streak, mood */}
+      <LifeScoreCard />
+
       {/* Daily reward */}
       <DailyRewardCard onClaimed={() => setProfile(getProfile())} />
 
@@ -234,6 +240,9 @@ export default function Dashboard() {
         </Link>
       )}
 
+      {/* Smart Scheduler */}
+      <SmartSchedulerCard />
+
       {/* Forge tools — quick access to advanced features */}
       <div>
         <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 px-1">
@@ -242,12 +251,15 @@ export default function Dashboard() {
         <div className="grid grid-cols-3 gap-2">
           {[
             { to: "/quests", label: "Quests", Icon: Scroll, hint: "Daily" },
-            { to: "/focus", label: "Focus", Icon: Timer, hint: "30m–2h" },
+            { to: "/focus", label: "Focus", Icon: Timer, hint: "Deep" },
             { to: "/bets", label: "Bets", Icon: Coins, hint: "Stake XP" },
             { to: "/future", label: "Future", Icon: Eye, hint: "Oracle" },
             { to: "/alter-ego", label: "Alter Ego", Icon: Drama, hint: "Identity" },
             { to: "/journal", label: "Journal", Icon: Video, hint: "Record" },
-            { to: "/achievements", label: "Badges", Icon: Trophy, hint: "Forge feats" },
+            { to: "/timeline", label: "Timeline", Icon: Calendar, hint: "Saga" },
+            { to: "/weekly-review", label: "Review", Icon: BookOpen, hint: "Weekly" },
+            { to: "/themes", label: "Themes", Icon: Palette, hint: "Skins" },
+            { to: "/achievements", label: "Badges", Icon: Trophy, hint: "Feats" },
             { to: "/premium", label: "Premium", Icon: Crown, hint: premium ? "Active" : "Unlock" },
           ].map(({ to, label, Icon, hint }) => (
             <Link
