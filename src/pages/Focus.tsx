@@ -68,7 +68,8 @@ export default function Focus() {
   const [today, setToday] = useState<FocusSession[]>(focusSessionsToday);
   const startedAtRef = useRef<string | null>(null);
   const [ambientKind, setAmbientKind] = useState<ambient.AmbientKind>("off");
-  const [summary, setSummary] = useState<{ minutes: number; xp: number; complete: boolean } | null>(null);
+  const [summary, setSummary] = useState<{ minutes: number; xp: number; complete: boolean; productivity: number } | null>(null);
+  const [immersive, setImmersive] = useState<boolean>(false);
   const habits = useMemo(() => getHabits(), []);
 
   // Reset remaining when duration changes (and not running)
@@ -105,6 +106,7 @@ export default function Focus() {
     const endsAt = Date.now() + remaining * 1000;
     saveState({ duration, habitId, endsAt });
     setRunning(true);
+    setImmersive(true); // enter distraction-free mode automatically
     if (premium && ambientKind !== "off") ambient.play(ambientKind);
   }
   function pause() {
@@ -121,6 +123,7 @@ export default function Focus() {
   }
   function finish(completed: boolean) {
     setRunning(false);
+    setImmersive(false);
     const startedAt = startedAtRef.current ?? new Date().toISOString();
     const completedMin = Math.round((duration * 60 - remaining) / 60) || (completed ? duration : 0);
     const minutes = completed ? duration : completedMin;
@@ -143,9 +146,13 @@ export default function Focus() {
       confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       toast.success(`Focus complete — +${xp} XP forged.`);
     } else {
-      toast("Session ended early — progress logged.");
+      toast(minutes > 0 ? `Session ended early — ${minutes} min logged.` : "Session ended.");
     }
-    setSummary({ minutes, xp, complete: completed });
+    // Productivity score: 0..100 based on % of planned time + ambient bonus
+    const ratio = duration > 0 ? Math.min(1, minutes / duration) : 0;
+    const ambientBonus = ambientKind !== "off" ? 5 : 0;
+    const productivity = Math.min(100, Math.round(ratio * 95 + ambientBonus));
+    setSummary({ minutes, xp, complete: completed, productivity });
     startedAtRef.current = null;
     setRemaining(duration * 60);
   }
