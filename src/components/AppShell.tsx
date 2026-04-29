@@ -24,6 +24,14 @@ export default function AppShell() {
               <span className="text-gradient-forest">LifeForge AI</span>
             </Link>
             <div className="flex items-center gap-2">
+              {!online && (
+                <span
+                  title="Offline — your data is safe on this device"
+                  className="flex items-center gap-1 text-[10px] uppercase tracking-wider px-2 py-1 rounded-full border border-accent/40 bg-accent/10 text-rune"
+                >
+                  <WifiOff className="w-3 h-3" /> Offline
+                </span>
+              )}
               <Link
                 to="/premium"
                 aria-label="Premium"
