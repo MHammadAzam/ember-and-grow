@@ -125,7 +125,102 @@
     --shadow-leaf: 0 10px 40px -10px hsl(158 70% 25% / 0.6);
     --shadow-rune-glow: 0 0 28px hsl(42 85% 55% / 0.5);
   }
-}
+
+  /* ---- Premium Theme: Dark Pro ---- */
+  :root[data-theme="dark-pro"],
+  :root[data-theme="dark-pro"].dark {
+    --background: 220 18% 6%;
+    --foreground: 40 30% 92%;
+    --card: 220 16% 10%;
+    --card-foreground: 40 30% 92%;
+    --popover: 220 16% 10%;
+    --popover-foreground: 40 30% 92%;
+    --primary: 42 90% 58%;
+    --primary-foreground: 220 25% 8%;
+    --primary-glow: 42 95% 68%;
+    --secondary: 220 14% 14%;
+    --secondary-foreground: 40 30% 92%;
+    --muted: 220 14% 14%;
+    --muted-foreground: 40 10% 65%;
+    --accent: 42 90% 58%;
+    --accent-foreground: 220 25% 8%;
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 42 90% 58%;
+    --rune: 42 90% 58%;
+    --gradient-forest: linear-gradient(135deg, hsl(42 90% 50%), hsl(35 95% 55%));
+    --gradient-rune: linear-gradient(135deg, hsl(42 90% 50%), hsl(48 100% 65%));
+    --gradient-mist: radial-gradient(ellipse at top, hsl(220 30% 12% / 0.9), transparent 60%),
+                     radial-gradient(ellipse at bottom, hsl(220 18% 6%), hsl(220 18% 4%));
+  }
+
+  /* ---- Premium Theme: Neon Focus ---- */
+  :root[data-theme="neon-focus"],
+  :root[data-theme="neon-focus"].dark {
+    --background: 260 35% 8%;
+    --foreground: 280 30% 96%;
+    --card: 260 30% 12%;
+    --card-foreground: 280 30% 96%;
+    --popover: 260 30% 12%;
+    --popover-foreground: 280 30% 96%;
+    --primary: 295 90% 60%;
+    --primary-foreground: 260 35% 8%;
+    --primary-glow: 295 95% 70%;
+    --secondary: 260 25% 16%;
+    --secondary-foreground: 280 30% 96%;
+    --muted: 260 25% 16%;
+    --muted-foreground: 280 15% 65%;
+    --accent: 190 95% 55%;
+    --accent-foreground: 260 35% 8%;
+    --border: 295 40% 25%;
+    --input: 260 30% 18%;
+    --ring: 295 90% 60%;
+    --rune: 190 95% 55%;
+    --gradient-forest: linear-gradient(135deg, hsl(295 90% 55%), hsl(190 95% 55%));
+    --gradient-rune: linear-gradient(135deg, hsl(190 95% 55%), hsl(295 90% 60%));
+    --gradient-arcane: linear-gradient(135deg, hsl(295 90% 55%), hsl(220 90% 60%));
+    --gradient-mist: radial-gradient(ellipse at top, hsl(295 60% 18% / 0.9), transparent 60%),
+                     radial-gradient(ellipse at bottom, hsl(260 35% 8%), hsl(260 40% 5%));
+    --shadow-rune-glow: 0 0 32px hsl(295 95% 60% / 0.55);
+  }
+
+  /* ---- Premium Theme: Minimal Zen ---- */
+  :root[data-theme="minimal-zen"] {
+    --background: 40 25% 97%;
+    --foreground: 220 15% 18%;
+    --card: 40 30% 99%;
+    --card-foreground: 220 15% 18%;
+    --popover: 40 30% 99%;
+    --popover-foreground: 220 15% 18%;
+    --primary: 220 15% 25%;
+    --primary-foreground: 40 30% 97%;
+    --primary-glow: 220 12% 40%;
+    --secondary: 40 20% 92%;
+    --secondary-foreground: 220 15% 18%;
+    --muted: 40 18% 90%;
+    --muted-foreground: 220 8% 45%;
+    --accent: 220 15% 35%;
+    --accent-foreground: 40 30% 97%;
+    --border: 220 8% 85%;
+    --input: 220 8% 85%;
+    --ring: 220 15% 25%;
+    --rune: 220 15% 35%;
+    --gradient-forest: linear-gradient(135deg, hsl(220 15% 25%), hsl(220 10% 45%));
+    --gradient-rune: linear-gradient(135deg, hsl(220 15% 30%), hsl(220 10% 50%));
+    --gradient-mist: linear-gradient(180deg, hsl(40 25% 98%), hsl(40 25% 95%));
+    --shadow-rune-glow: 0 0 14px hsl(220 15% 35% / 0.18);
+  }
+  :root[data-theme="minimal-zen"].dark {
+    --background: 220 12% 10%;
+    --foreground: 40 20% 92%;
+    --card: 220 12% 14%;
+    --card-foreground: 40 20% 92%;
+    --primary: 40 20% 92%;
+    --primary-foreground: 220 12% 10%;
+    --border: 220 10% 22%;
+    --rune: 40 20% 80%;
+    --gradient-mist: linear-gradient(180deg, hsl(220 12% 12%), hsl(220 12% 9%));
+  }
 
 @layer base {
   * { @apply border-border; }
