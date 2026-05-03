@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video, Trophy, Crown, Lock, Calendar, Palette, BookOpen } from "lucide-react";
+import { Plus, Sparkles, Shield, Scroll, Timer, Coins, Eye, Drama, Video, Trophy, Crown, Lock, Calendar, Palette, BookOpen, Grid3x3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import HabitCard from "@/components/HabitCard";
 import AddHabitDialog from "@/components/AddHabitDialog";
@@ -256,6 +256,7 @@ export default function Dashboard() {
             { to: "/future", label: "Future", Icon: Eye, hint: "Oracle" },
             { to: "/alter-ego", label: "Alter Ego", Icon: Drama, hint: "Identity" },
             { to: "/journal", label: "Journal", Icon: Video, hint: "Record" },
+            { to: "/monthly", label: "Monthly", Icon: Grid3x3, hint: "Tracker" },
             { to: "/timeline", label: "Timeline", Icon: Calendar, hint: "Saga" },
             { to: "/weekly-review", label: "Review", Icon: BookOpen, hint: "Weekly" },
             { to: "/themes", label: "Themes", Icon: Palette, hint: "Skins" },

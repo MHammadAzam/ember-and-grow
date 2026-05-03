@@ -20,6 +20,7 @@ import Achievements from "./pages/Achievements";
 import Themes from "./pages/Themes";
 import Timeline from "./pages/Timeline";
 import WeeklyReview from "./pages/WeeklyReview";
+import MonthlyTracker from "./pages/MonthlyTracker";
 import NotFound from "./pages/NotFound";
 import AppShell from "./components/AppShell";
 
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/themes" element={<Themes />} />
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/weekly-review" element={<WeeklyReview />} />
+            <Route path="/monthly" element={<MonthlyTracker />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
