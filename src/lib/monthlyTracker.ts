@@ -27,7 +27,7 @@ export function setMissedDates(habitId: string, dates: string[]) {
   saveMissedMap(map);
 }
 
-export type CellStatus = "empty" | "completed" | "missed";
+export type CellStatus = "empty" | "completed" | "missed" | "pending";
 
 export function dateKey(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;

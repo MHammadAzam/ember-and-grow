@@ -56,17 +56,15 @@ export default function MonthlyTracker() {
       const key = dateKey(year, month, day);
       if (habit.completedDates.includes(key)) return "completed";
       if ((missedMap[habit.id] ?? []).includes(key)) return "missed";
+      if (key === todayKey) return "pending";
       return "empty";
     },
-    [year, month, missedMap],
+    [year, month, missedMap, todayKey],
   );
 
   const cycleCell = (habit: Habit, day: number) => {
     const key = dateKey(year, month, day);
     const status = cellStatus(habit, day);
-
-    let nextHabits = habits;
-    let nextMissed = missedMap;
 
     // Remove from both first
     const completed = habit.completedDates.filter((d) => d !== key);
@@ -75,16 +73,17 @@ export default function MonthlyTracker() {
     let newCompleted = completed;
     let newMissed = missed;
 
-    if (status === "empty") newCompleted = [...completed, key];
+    // Cycle: empty/pending -> completed -> missed -> empty
+    if (status === "empty" || status === "pending") newCompleted = [...completed, key];
     else if (status === "completed") newMissed = [...missed, key];
     // if "missed" -> empty (already removed)
 
-    nextHabits = habits.map((h) =>
+    const nextHabits = habits.map((h) =>
       h.id === habit.id
         ? { ...h, completedDates: newCompleted, streak: calculateStreak(newCompleted, h.shieldUsedOnMonth) }
         : h,
     );
-    nextMissed = { ...missedMap, [habit.id]: newMissed };
+    const nextMissed = { ...missedMap, [habit.id]: newMissed };
 
     setHabits(nextHabits);
     setMissedMap(nextMissed);
