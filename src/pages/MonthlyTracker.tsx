@@ -56,17 +56,15 @@ export default function MonthlyTracker() {
       const key = dateKey(year, month, day);
       if (habit.completedDates.includes(key)) return "completed";
       if ((missedMap[habit.id] ?? []).includes(key)) return "missed";
+      if (key === todayKey) return "pending";
       return "empty";
     },
-    [year, month, missedMap],
+    [year, month, missedMap, todayKey],
   );
 
   const cycleCell = (habit: Habit, day: number) => {
     const key = dateKey(year, month, day);
     const status = cellStatus(habit, day);
-
-    let nextHabits = habits;
-    let nextMissed = missedMap;
 
     // Remove from both first
     const completed = habit.completedDates.filter((d) => d !== key);
@@ -75,16 +73,17 @@ export default function MonthlyTracker() {
     let newCompleted = completed;
     let newMissed = missed;
 
-    if (status === "empty") newCompleted = [...completed, key];
+    // Cycle: empty/pending -> completed -> missed -> empty
+    if (status === "empty" || status === "pending") newCompleted = [...completed, key];
     else if (status === "completed") newMissed = [...missed, key];
     // if "missed" -> empty (already removed)
 
-    nextHabits = habits.map((h) =>
+    const nextHabits = habits.map((h) =>
       h.id === habit.id
         ? { ...h, completedDates: newCompleted, streak: calculateStreak(newCompleted, h.shieldUsedOnMonth) }
         : h,
     );
-    nextMissed = { ...missedMap, [habit.id]: newMissed };
+    const nextMissed = { ...missedMap, [habit.id]: newMissed };
 
     setHabits(nextHabits);
     setMissedMap(nextMissed);
@@ -126,7 +125,7 @@ export default function MonthlyTracker() {
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Monthly</p>
             <h1 className="font-display text-2xl text-gradient-forest">Habit Tracker</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Tap a cell: empty → ✅ → ❌ → empty
+              Tap: ⭕ → ✅ → ❌ → empty · today stays ⭕ until marked
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -199,11 +198,13 @@ export default function MonthlyTracker() {
                                 status === "empty" && "bg-muted/40 hover:bg-muted",
                                 status === "completed" && "bg-green-500/25 text-green-500",
                                 status === "missed" && "bg-red-500/25 text-red-500",
+                                status === "pending" && "bg-amber-500/15 text-amber-500 ring-1 ring-amber-500/40 animate-pulse",
                               )}
                               aria-label={`${h.name} day ${d}: ${status}`}
                             >
                               {status === "completed" && <Check className="w-3.5 h-3.5" />}
                               {status === "missed" && <X className="w-3.5 h-3.5" />}
+                              {status === "pending" && <span className="text-[10px]">○</span>}
                             </button>
                           </td>
                         );
@@ -216,12 +217,15 @@ export default function MonthlyTracker() {
           </div>
 
           {/* Legend */}
-          <div className="flex items-center gap-4 text-xs text-muted-foreground px-1">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground px-1 flex-wrap">
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-green-500/40" /> Completed
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-red-500/40" /> Missed
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded bg-amber-500/30 ring-1 ring-amber-500/40" /> Pending (today)
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-muted/60" /> Empty

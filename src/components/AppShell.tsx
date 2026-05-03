@@ -1,11 +1,13 @@
 import { Outlet, Link } from "react-router-dom";
 import { Moon, Sun, Crown, WifiOff } from "lucide-react";
+import { useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import PinGate from "@/components/PinGate";
 import { useTheme } from "@/hooks/useTheme";
 import { useThemeStore } from "@/hooks/useThemeStore";
 import { useOnline } from "@/hooks/useOnline";
 import { usePremium } from "@/hooks/usePremium";
+import { runMissedSweep } from "@/lib/missedRules";
 
 /** App shell for the authenticated/main routes. Provides top brand bar + bottom nav. */
 export default function AppShell() {
@@ -13,6 +15,11 @@ export default function AppShell() {
   useThemeStore(); // applies the active premium theme
   const online = useOnline();
   const { unlocked: premium } = usePremium();
+
+  useEffect(() => {
+    runMissedSweep();
+  }, []);
+
 
   return (
     <PinGate>
