@@ -12,6 +12,7 @@ import { usePremium } from "@/hooks/usePremium";
 import { setAdminEmail } from "@/lib/premium";
 import { hasPin, setPin, clearPin } from "@/lib/appLock";
 import { toast } from "sonner";
+import { getMissedSettings, saveMissedSettings, runMissedSweep } from "@/lib/missedRules";
 
 export default function Settings() {
   const [profile, setProfileState] = useState(getProfile);
@@ -21,6 +22,13 @@ export default function Settings() {
   const [email, setEmail] = useState(premium.email ?? "");
   const [pinValue, setPinValue] = useState("");
   const [pinSet, setPinSet] = useState<boolean>(hasPin);
+  const [missed, setMissed] = useState(getMissedSettings);
+
+  const updateMissed = (patch: Partial<typeof missed>) => {
+    const next = { ...missed, ...patch };
+    setMissed(next);
+    saveMissedSettings(next);
+  };
 
   const saveName = () => {
     const next = { ...profile, name: name.trim() || "Adventurer" };
