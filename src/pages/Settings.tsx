@@ -163,6 +163,65 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Habit tracking rules */}
+      <div className="glass-card rounded-2xl p-5 space-y-4">
+        <div>
+          <p className="font-display text-lg">Habit tracking rules</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            How unmarked past days are handled.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="font-medium text-sm">Auto mark missed habits as ❌</p>
+            <p className="text-xs text-muted-foreground">
+              Past days with no check-in turn into a miss after the cutoff.
+            </p>
+          </div>
+          <Switch
+            checked={missed.autoMarkMissed}
+            onCheckedChange={(v) => updateMissed({ autoMarkMissed: v })}
+          />
+        </div>
+
+        <div>
+          <Label>Grace period cutoff</Label>
+          <div className="flex flex-wrap gap-2 mt-1.5">
+            {[0, 1, 2, 3, 4, 5, 6].map((h) => (
+              <button
+                key={h}
+                type="button"
+                onClick={() => updateMissed({ graceHour: h })}
+                className={`px-3 py-1.5 rounded-lg border text-xs transition-colors ${
+                  missed.graceHour === h
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/60 hover:bg-card"
+                }`}
+              >
+                {h === 0 ? "Midnight" : `${h} AM`}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1.5">
+            Yesterday stays editable until this time. Default: 3 AM.
+          </p>
+        </div>
+
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            // Force re-run by clearing the daily guard.
+            localStorage.removeItem("lifeforge_missed_lastrun");
+            const n = runMissedSweep();
+            toast.success(n > 0 ? `Marked ${n} day${n === 1 ? "" : "s"} as missed` : "Nothing to mark");
+          }}
+        >
+          Run sweep now
+        </Button>
+      </div>
+
       {/* Theme */}
       <div className="glass-card rounded-2xl p-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
