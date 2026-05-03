@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, X } from "lucide-react";
 import { getHabits, saveHabits, Habit, calculateStreak } from "@/lib/habitStore";
@@ -12,10 +12,36 @@ const MONTH_NAMES = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+const VIEW_KEY = "lifeforge_monthly_view";
+
 export default function MonthlyTracker() {
   const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth()); // 0-indexed
+  const [year, setYear] = useState<number>(() => {
+    try {
+      const raw = localStorage.getItem(VIEW_KEY);
+      if (raw) {
+        const v = JSON.parse(raw);
+        if (typeof v.year === "number") return v.year;
+      }
+    } catch {}
+    return today.getFullYear();
+  });
+  const [month, setMonth] = useState<number>(() => {
+    try {
+      const raw = localStorage.getItem(VIEW_KEY);
+      if (raw) {
+        const v = JSON.parse(raw);
+        if (typeof v.month === "number") return v.month;
+      }
+    } catch {}
+    return today.getMonth();
+  }); // 0-indexed
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_KEY, JSON.stringify({ year, month }));
+    } catch {}
+  }, [year, month]);
 
   const [habits, setHabits] = useState<Habit[]>(getHabits);
   const [missedMap, setMissedMap] = useState(getMissedMap);
