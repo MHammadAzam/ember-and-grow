@@ -29,13 +29,21 @@ export default function DailyRewardCard({ onClaimed }: { onClaimed?: () => void 
   }
 
   const claim = () => {
-    const r = claimDailyReward();
-    if (!r) return;
-    confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
-    toast.success(`+${r.xp} XP and 🪙 ${r.coins} claimed (day ${r.day})`);
-    setState(getRewardState());
-    setAvailable(false);
-    onClaimed?.();
+    try {
+      const r = claimDailyReward();
+      if (!r) return;
+      // Confetti is cosmetic — never let it crash the claim flow.
+      try {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+      } catch { /* ignore */ }
+      toast.success(`+${r.xp} XP and 🪙 ${r.coins} claimed (day ${r.day})`);
+      setState(getRewardState());
+      setAvailable(false);
+      onClaimed?.();
+    } catch (err) {
+      console.error("[DailyReward] claim failed:", err);
+      toast.error("Could not claim reward — please try again");
+    }
   };
 
   return (
