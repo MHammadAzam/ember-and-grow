@@ -215,12 +215,71 @@ export default function Settings() {
           onClick={() => {
             // Force re-run by clearing the daily guard.
             localStorage.removeItem("lifeforge_missed_lastrun");
-            const n = runMissedSweep();
+            const n = runMissedSweep(new Date(), true);
+            setSweepLog(getSweepLog());
             toast.success(n > 0 ? `Marked ${n} day${n === 1 ? "" : "s"} as missed` : "Nothing to mark");
           }}
         >
           Run sweep now
         </Button>
+
+        {/* Last sweep status + log */}
+        <div className="rounded-xl border border-border/60 bg-card/40 p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Last sweep</p>
+            {sweepLog.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  clearSweepLog();
+                  setSweepLog([]);
+                  toast.success("Log cleared");
+                }}
+                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear log
+              </button>
+            )}
+          </div>
+          {sweepLog.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No sweeps recorded yet.</p>
+          ) : (
+            <>
+              <p className="text-xs text-muted-foreground">
+                {formatRelative(sweepLog[0].at)} ·{" "}
+                {sweepLog[0].skipped
+                  ? "skipped (auto-mark off)"
+                  : `${sweepLog[0].marked} day${sweepLog[0].marked === 1 ? "" : "s"} marked`}
+                {sweepLog[0].manual ? " · manual" : " · auto"}
+              </p>
+              <ul className="mt-1 max-h-44 overflow-auto divide-y divide-border/40 text-[11px]">
+                {sweepLog.map((e, i) => (
+                  <li key={i} className="flex items-center justify-between py-1.5 gap-2">
+                    <span className="text-muted-foreground truncate">
+                      {new Date(e.at).toLocaleString()}
+                    </span>
+                    <span className="flex items-center gap-1.5 shrink-0">
+                      <span
+                        className={`px-1.5 py-0.5 rounded ${
+                          e.skipped
+                            ? "bg-muted text-muted-foreground"
+                            : e.marked > 0
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-primary/10 text-primary"
+                        }`}
+                      >
+                        {e.skipped ? "skipped" : `${e.marked} marked`}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {e.manual ? "manual" : "auto"}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Theme */}
