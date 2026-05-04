@@ -14,6 +14,21 @@ import { hasPin, setPin, clearPin } from "@/lib/appLock";
 import { toast } from "sonner";
 import { getMissedSettings, saveMissedSettings, runMissedSweep, getSweepLog, clearSweepLog, type SweepLogEntry } from "@/lib/missedRules";
 
+function formatRelative(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Date.now() - then;
+  if (diff < 0) return "just now";
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return "just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} minute${m === 1 ? "" : "s"} ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h === 1 ? "" : "s"} ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d} day${d === 1 ? "" : "s"} ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
 export default function Settings() {
   const [profile, setProfileState] = useState(getProfile);
   const [name, setName] = useState(profile.name);
