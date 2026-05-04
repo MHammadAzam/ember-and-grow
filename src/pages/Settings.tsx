@@ -12,7 +12,7 @@ import { usePremium } from "@/hooks/usePremium";
 import { setAdminEmail } from "@/lib/premium";
 import { hasPin, setPin, clearPin } from "@/lib/appLock";
 import { toast } from "sonner";
-import { getMissedSettings, saveMissedSettings, runMissedSweep } from "@/lib/missedRules";
+import { getMissedSettings, saveMissedSettings, runMissedSweep, getSweepLog, clearSweepLog, type SweepLogEntry } from "@/lib/missedRules";
 
 export default function Settings() {
   const [profile, setProfileState] = useState(getProfile);
