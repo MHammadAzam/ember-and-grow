@@ -12,7 +12,22 @@ import { usePremium } from "@/hooks/usePremium";
 import { setAdminEmail } from "@/lib/premium";
 import { hasPin, setPin, clearPin } from "@/lib/appLock";
 import { toast } from "sonner";
-import { getMissedSettings, saveMissedSettings, runMissedSweep } from "@/lib/missedRules";
+import { getMissedSettings, saveMissedSettings, runMissedSweep, getSweepLog, clearSweepLog, type SweepLogEntry } from "@/lib/missedRules";
+
+function formatRelative(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Date.now() - then;
+  if (diff < 0) return "just now";
+  const s = Math.floor(diff / 1000);
+  if (s < 60) return "just now";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} minute${m === 1 ? "" : "s"} ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} hour${h === 1 ? "" : "s"} ago`;
+  const d = Math.floor(h / 24);
+  if (d < 7) return `${d} day${d === 1 ? "" : "s"} ago`;
+  return new Date(iso).toLocaleDateString();
+}
 
 export default function Settings() {
   const [profile, setProfileState] = useState(getProfile);
@@ -23,6 +38,7 @@ export default function Settings() {
   const [pinValue, setPinValue] = useState("");
   const [pinSet, setPinSet] = useState<boolean>(hasPin);
   const [missed, setMissed] = useState(getMissedSettings);
+  const [sweepLog, setSweepLog] = useState<SweepLogEntry[]>(getSweepLog);
 
   const updateMissed = (patch: Partial<typeof missed>) => {
     const next = { ...missed, ...patch };
@@ -214,12 +230,71 @@ export default function Settings() {
           onClick={() => {
             // Force re-run by clearing the daily guard.
             localStorage.removeItem("lifeforge_missed_lastrun");
-            const n = runMissedSweep();
+            const n = runMissedSweep(new Date(), true);
+            setSweepLog(getSweepLog());
             toast.success(n > 0 ? `Marked ${n} day${n === 1 ? "" : "s"} as missed` : "Nothing to mark");
           }}
         >
           Run sweep now
         </Button>
+
+        {/* Last sweep status + log */}
+        <div className="rounded-xl border border-border/60 bg-card/40 p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Last sweep</p>
+            {sweepLog.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  clearSweepLog();
+                  setSweepLog([]);
+                  toast.success("Log cleared");
+                }}
+                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear log
+              </button>
+            )}
+          </div>
+          {sweepLog.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No sweeps recorded yet.</p>
+          ) : (
+            <>
+              <p className="text-xs text-muted-foreground">
+                {formatRelative(sweepLog[0].at)} ·{" "}
+                {sweepLog[0].skipped
+                  ? "skipped (auto-mark off)"
+                  : `${sweepLog[0].marked} day${sweepLog[0].marked === 1 ? "" : "s"} marked`}
+                {sweepLog[0].manual ? " · manual" : " · auto"}
+              </p>
+              <ul className="mt-1 max-h-44 overflow-auto divide-y divide-border/40 text-[11px]">
+                {sweepLog.map((e, i) => (
+                  <li key={i} className="flex items-center justify-between py-1.5 gap-2">
+                    <span className="text-muted-foreground truncate">
+                      {new Date(e.at).toLocaleString()}
+                    </span>
+                    <span className="flex items-center gap-1.5 shrink-0">
+                      <span
+                        className={`px-1.5 py-0.5 rounded ${
+                          e.skipped
+                            ? "bg-muted text-muted-foreground"
+                            : e.marked > 0
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-primary/10 text-primary"
+                        }`}
+                      >
+                        {e.skipped ? "skipped" : `${e.marked} marked`}
+                      </span>
+                      <span className="text-muted-foreground">
+                        {e.manual ? "manual" : "auto"}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Theme */}

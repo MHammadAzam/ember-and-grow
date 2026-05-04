@@ -7,6 +7,44 @@ import { getMissedMap, saveMissedMap, dateKey } from "@/lib/monthlyTracker";
 
 const SETTINGS_KEY = "lifeforge_missed_settings";
 const LAST_RUN_KEY = "lifeforge_missed_lastrun";
+const LOG_KEY = "lifeforge_missed_log";
+const LOG_MAX = 20;
+
+export interface SweepLogEntry {
+  /** ISO timestamp when the sweep ran. */
+  at: string;
+  /** Number of cells marked as missed during this run. */
+  marked: number;
+  /** Whether the sweep was triggered manually (vs. auto on app load). */
+  manual: boolean;
+  /** Whether auto-mark was disabled at the time (sweep skipped). */
+  skipped?: boolean;
+}
+
+export function getSweepLog(): SweepLogEntry[] {
+  try {
+    const raw = localStorage.getItem(LOG_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+export function clearSweepLog() {
+  localStorage.removeItem(LOG_KEY);
+}
+
+function appendSweepLog(entry: SweepLogEntry) {
+  const log = getSweepLog();
+  log.unshift(entry);
+  localStorage.setItem(LOG_KEY, JSON.stringify(log.slice(0, LOG_MAX)));
+}
+
+export function getLastSweepAt(): string | null {
+  return getSweepLog()[0]?.at ?? null;
+}
 
 export interface MissedSettings {
   /** Auto-mark unmarked past-day habits as missed. */
@@ -60,18 +98,24 @@ export function lastClosedDate(now: Date, graceHour: number): Date {
  *
  * Returns the number of cells marked.
  */
-export function runMissedSweep(now: Date = new Date()): number {
+export function runMissedSweep(now: Date = new Date(), manual = false): number {
   const settings = getMissedSettings();
-  if (!settings.autoMarkMissed) return 0;
+  if (!settings.autoMarkMissed) {
+    if (manual) {
+      appendSweepLog({ at: now.toISOString(), marked: 0, manual: true, skipped: true });
+    }
+    return 0;
+  }
 
   const todayK = ymd(now);
   const lastRun = localStorage.getItem(LAST_RUN_KEY);
   // Skip if already ran today (cheap guard; still cheap if we don't).
-  if (lastRun === todayK) return 0;
+  if (!manual && lastRun === todayK) return 0;
 
   const habits = getHabits();
   if (habits.length === 0) {
     localStorage.setItem(LAST_RUN_KEY, todayK);
+    appendSweepLog({ at: now.toISOString(), marked: 0, manual });
     return 0;
   }
 
@@ -121,6 +165,7 @@ export function runMissedSweep(now: Date = new Date()): number {
   if (changedMissed) saveMissedMap(missedMap);
   if (changedHabits) saveHabits(nextHabits);
   localStorage.setItem(LAST_RUN_KEY, todayK);
+  appendSweepLog({ at: now.toISOString(), marked: count, manual });
   return count;
 }
 
