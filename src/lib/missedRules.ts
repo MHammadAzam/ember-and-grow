@@ -98,18 +98,24 @@ export function lastClosedDate(now: Date, graceHour: number): Date {
  *
  * Returns the number of cells marked.
  */
-export function runMissedSweep(now: Date = new Date()): number {
+export function runMissedSweep(now: Date = new Date(), manual = false): number {
   const settings = getMissedSettings();
-  if (!settings.autoMarkMissed) return 0;
+  if (!settings.autoMarkMissed) {
+    if (manual) {
+      appendSweepLog({ at: now.toISOString(), marked: 0, manual: true, skipped: true });
+    }
+    return 0;
+  }
 
   const todayK = ymd(now);
   const lastRun = localStorage.getItem(LAST_RUN_KEY);
   // Skip if already ran today (cheap guard; still cheap if we don't).
-  if (lastRun === todayK) return 0;
+  if (!manual && lastRun === todayK) return 0;
 
   const habits = getHabits();
   if (habits.length === 0) {
     localStorage.setItem(LAST_RUN_KEY, todayK);
+    appendSweepLog({ at: now.toISOString(), marked: 0, manual });
     return 0;
   }
 
@@ -159,6 +165,7 @@ export function runMissedSweep(now: Date = new Date()): number {
   if (changedMissed) saveMissedMap(missedMap);
   if (changedHabits) saveHabits(nextHabits);
   localStorage.setItem(LAST_RUN_KEY, todayK);
+  appendSweepLog({ at: now.toISOString(), marked: count, manual });
   return count;
 }
 
