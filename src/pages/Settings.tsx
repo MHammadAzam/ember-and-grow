@@ -23,6 +23,7 @@ export default function Settings() {
   const [pinValue, setPinValue] = useState("");
   const [pinSet, setPinSet] = useState<boolean>(hasPin);
   const [missed, setMissed] = useState(getMissedSettings);
+  const [sweepLog, setSweepLog] = useState<SweepLogEntry[]>(getSweepLog);
 
   const updateMissed = (patch: Partial<typeof missed>) => {
     const next = { ...missed, ...patch };
