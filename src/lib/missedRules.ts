@@ -7,6 +7,44 @@ import { getMissedMap, saveMissedMap, dateKey } from "@/lib/monthlyTracker";
 
 const SETTINGS_KEY = "lifeforge_missed_settings";
 const LAST_RUN_KEY = "lifeforge_missed_lastrun";
+const LOG_KEY = "lifeforge_missed_log";
+const LOG_MAX = 20;
+
+export interface SweepLogEntry {
+  /** ISO timestamp when the sweep ran. */
+  at: string;
+  /** Number of cells marked as missed during this run. */
+  marked: number;
+  /** Whether the sweep was triggered manually (vs. auto on app load). */
+  manual: boolean;
+  /** Whether auto-mark was disabled at the time (sweep skipped). */
+  skipped?: boolean;
+}
+
+export function getSweepLog(): SweepLogEntry[] {
+  try {
+    const raw = localStorage.getItem(LOG_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+export function clearSweepLog() {
+  localStorage.removeItem(LOG_KEY);
+}
+
+function appendSweepLog(entry: SweepLogEntry) {
+  const log = getSweepLog();
+  log.unshift(entry);
+  localStorage.setItem(LOG_KEY, JSON.stringify(log.slice(0, LOG_MAX)));
+}
+
+export function getLastSweepAt(): string | null {
+  return getSweepLog()[0]?.at ?? null;
+}
 
 export interface MissedSettings {
   /** Auto-mark unmarked past-day habits as missed. */
