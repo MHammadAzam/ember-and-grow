@@ -1,32 +1,56 @@
 import { useEffect, useState } from "react";
 
 const THEME_KEY = "lifeforge_theme";
+const EVENT = "lifeforge:mode-change";
 
 function readInitial(): boolean {
   if (typeof window === "undefined") return false;
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved) return saved === "dark";
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === "dark") return true;
+    if (saved === "light") return false;
+  } catch { /* ignore */ }
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
 }
 
-/** Single source of truth for dark/light mode.
- *  Persists to localStorage and syncs across components via a `storage` event. */
-export function useTheme() {
-  const [dark, setDark] = useState<boolean>(readInitial);
-
-  useEffect(() => {
+function applyMode(dark: boolean) {
+  try {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
-  }, [dark]);
+  } catch { /* ignore */ }
+}
 
-  // Keep multiple components (header toggle + Settings switch) in sync.
+/** Single source of truth for dark/light mode.
+ *  Persists to localStorage and syncs across components in the same tab
+ *  via a custom event (storage events only fire cross-tab). */
+export function useTheme() {
+  const [dark, setDarkState] = useState<boolean>(readInitial);
+
+  // Apply on mount + whenever value changes.
+  useEffect(() => { applyMode(dark); }, [dark]);
+
+  // Sync with other mounted components & cross-tab changes.
   useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === THEME_KEY && e.newValue) setDark(e.newValue === "dark");
+    const onChange = () => {
+      const saved = localStorage.getItem(THEME_KEY);
+      setDarkState(saved === "dark");
     };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === THEME_KEY && e.newValue) setDarkState(e.newValue === "dark");
+    };
+    window.addEventListener(EVENT, onChange);
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(EVENT, onChange);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
-  return { dark, setDark, toggle: () => setDark((d) => !d) };
+  const setDark = (v: boolean) => {
+    setDarkState(v);
+    applyMode(v);
+    try { window.dispatchEvent(new CustomEvent(EVENT)); } catch { /* ignore */ }
+  };
+
+  return { dark, setDark, toggle: () => setDark(!dark) };
 }
