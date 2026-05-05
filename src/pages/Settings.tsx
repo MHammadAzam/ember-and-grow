@@ -13,6 +13,8 @@ import { setAdminEmail } from "@/lib/premium";
 import { hasPin, setPin, clearPin } from "@/lib/appLock";
 import { toast } from "sonner";
 import { getMissedSettings, saveMissedSettings, runMissedSweep, getSweepLog, clearSweepLog, type SweepLogEntry } from "@/lib/missedRules";
+import { getErrorLog, clearErrorLog, type ErrorLogEntry } from "@/lib/errorLog";
+import { Bug } from "lucide-react";
 
 function formatRelative(iso: string): string {
   const then = new Date(iso).getTime();
@@ -39,6 +41,7 @@ export default function Settings() {
   const [pinSet, setPinSet] = useState<boolean>(hasPin);
   const [missed, setMissed] = useState(getMissedSettings);
   const [sweepLog, setSweepLog] = useState<SweepLogEntry[]>(getSweepLog);
+  const [errorLog, setErrorLog] = useState<ErrorLogEntry[]>(getErrorLog);
 
   const updateMissed = (patch: Partial<typeof missed>) => {
     const next = { ...missed, ...patch };
@@ -366,6 +369,68 @@ export default function Settings() {
         <Button variant="destructive" onClick={wipe} className="gap-2 w-full">
           <Trash2 className="w-4 h-4" /> Erase all data
         </Button>
+      </div>
+
+      {/* Error log viewer */}
+      <div className="glass-card rounded-2xl p-5 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-display text-lg flex items-center gap-2">
+            <Bug className="w-4 h-4 text-destructive" /> Error log
+          </p>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setErrorLog(getErrorLog())}>
+              Refresh
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { clearErrorLog(); setErrorLog([]); toast.success("Error log cleared"); }}
+              disabled={errorLog.length === 0}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Captures render crashes, uncaught errors and rejected promises — useful when the
+          app turns white after claiming rewards or switching themes.
+        </p>
+        {errorLog.length === 0 ? (
+          <p className="text-sm text-muted-foreground italic">No errors captured. ✨</p>
+        ) : (
+          <div className="space-y-2 max-h-72 overflow-auto">
+            {errorLog.map((e, i) => (
+              <div
+                key={i}
+                className="text-xs rounded-lg border border-border/60 bg-muted/30 p-2 space-y-1"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="uppercase tracking-wider text-[10px] px-1.5 py-0.5 rounded-full border border-destructive/40 bg-destructive/10 text-destructive">
+                    {e.source}
+                  </span>
+                  <span className="text-muted-foreground">{formatRelative(e.at)}</span>
+                </div>
+                <p className="font-mono break-words">{e.message}</p>
+                {e.context && (
+                  <p className="text-[10px] text-muted-foreground">context: {e.context}</p>
+                )}
+                {e.url && (
+                  <p className="text-[10px] text-muted-foreground">at {e.url}</p>
+                )}
+                {e.stack && (
+                  <details>
+                    <summary className="cursor-pointer text-[10px] text-muted-foreground">
+                      stack trace
+                    </summary>
+                    <pre className="mt-1 text-[10px] whitespace-pre-wrap break-all max-h-40 overflow-auto">
+                      {e.stack}
+                    </pre>
+                  </details>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <p className="text-xs text-center text-muted-foreground">

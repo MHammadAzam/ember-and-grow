@@ -1,6 +1,7 @@
 import { Component, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { logError } from "@/lib/errorLog";
 
 interface Props { children: ReactNode }
 interface State { error: Error | null }
@@ -17,6 +18,15 @@ export default class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, info: unknown) {
     // Surface for debugging without breaking the UI.
     console.error("[LifeForge] render error:", error, info);
+    const componentStack =
+      info && typeof info === "object" && "componentStack" in info
+        ? String((info as { componentStack?: string }).componentStack ?? "")
+        : "";
+    logError({
+      source: "render",
+      message: error.message,
+      stack: `${error.stack ?? ""}\n${componentStack}`.trim(),
+    });
   }
 
   reset = () => this.setState({ error: null });
