@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 import { applyTheme, getThemeState, type ThemeId } from "@/lib/themes";
+import { logError } from "@/lib/errorLog";
 
-/** Reactive theme state. Applies on mount + when changed. */
+/** Reactive theme state. Applies on mount + when changed. Crash-proof. */
 export function useThemeStore() {
-  const [active, setActive] = useState<ThemeId>(() => getThemeState().active);
-
-  useEffect(() => { applyTheme(active); }, [active]);
+  const [active, setActive] = useState<ThemeId>(() => {
+    try { return getThemeState().active; } catch { return "default"; }
+  });
 
   useEffect(() => {
-    const onChange = () => setActive(getThemeState().active);
+    try { applyTheme(active); } catch (err) {
+      logError({
+        source: "manual",
+        context: "useThemeStore:apply",
+        message: err instanceof Error ? err.message : "applyTheme threw",
+      });
+    }
+  }, [active]);
+
+  useEffect(() => {
+    const onChange = () => {
+      try { setActive(getThemeState().active); } catch { setActive("default"); }
+    };
     window.addEventListener("lifeforge:theme-change", onChange);
     window.addEventListener("storage", onChange);
     return () => {
