@@ -126,8 +126,32 @@
     --shadow-rune-glow: 0 0 28px hsl(42 85% 55% / 0.5);
   }
 
-  /* ---- Premium Theme: Dark Pro ---- */
-  :root[data-theme="dark-pro"],
+  /* ---- Premium Theme: Dark Pro (light variant) ---- */
+  :root[data-theme="dark-pro"] {
+    --background: 40 25% 96%;
+    --foreground: 220 25% 12%;
+    --card: 40 30% 99%;
+    --card-foreground: 220 25% 12%;
+    --popover: 40 30% 99%;
+    --popover-foreground: 220 25% 12%;
+    --primary: 42 85% 42%;
+    --primary-foreground: 40 30% 98%;
+    --primary-glow: 42 90% 55%;
+    --secondary: 40 20% 92%;
+    --secondary-foreground: 220 25% 12%;
+    --muted: 40 18% 90%;
+    --muted-foreground: 220 10% 40%;
+    --accent: 42 85% 42%;
+    --accent-foreground: 40 30% 98%;
+    --border: 220 10% 82%;
+    --input: 220 10% 82%;
+    --ring: 42 85% 42%;
+    --rune: 42 85% 42%;
+    --gradient-forest: linear-gradient(135deg, hsl(42 85% 42%), hsl(35 90% 50%));
+    --gradient-rune: linear-gradient(135deg, hsl(42 85% 42%), hsl(48 95% 55%));
+    --gradient-mist: linear-gradient(180deg, hsl(40 25% 97%), hsl(40 25% 94%));
+  }
+  /* ---- Premium Theme: Dark Pro (dark variant) ---- */
   :root[data-theme="dark-pro"].dark {
     --background: 220 18% 6%;
     --foreground: 40 30% 92%;
@@ -154,8 +178,34 @@
                      radial-gradient(ellipse at bottom, hsl(220 18% 6%), hsl(220 18% 4%));
   }
 
-  /* ---- Premium Theme: Neon Focus ---- */
-  :root[data-theme="neon-focus"],
+  /* ---- Premium Theme: Neon Focus (light variant) ---- */
+  :root[data-theme="neon-focus"] {
+    --background: 280 30% 97%;
+    --foreground: 260 35% 12%;
+    --card: 280 30% 99%;
+    --card-foreground: 260 35% 12%;
+    --popover: 280 30% 99%;
+    --popover-foreground: 260 35% 12%;
+    --primary: 295 80% 48%;
+    --primary-foreground: 280 30% 98%;
+    --primary-glow: 295 85% 60%;
+    --secondary: 280 25% 93%;
+    --secondary-foreground: 260 35% 12%;
+    --muted: 280 20% 92%;
+    --muted-foreground: 260 12% 40%;
+    --accent: 190 85% 42%;
+    --accent-foreground: 280 30% 98%;
+    --border: 295 30% 82%;
+    --input: 280 20% 88%;
+    --ring: 295 80% 48%;
+    --rune: 190 85% 42%;
+    --gradient-forest: linear-gradient(135deg, hsl(295 80% 50%), hsl(190 85% 45%));
+    --gradient-rune: linear-gradient(135deg, hsl(190 85% 45%), hsl(295 80% 50%));
+    --gradient-arcane: linear-gradient(135deg, hsl(295 80% 50%), hsl(220 80% 55%));
+    --gradient-mist: linear-gradient(180deg, hsl(280 30% 97%), hsl(280 25% 94%));
+    --shadow-rune-glow: 0 0 18px hsl(295 80% 55% / 0.25);
+  }
+  /* ---- Premium Theme: Neon Focus (dark variant) ---- */
   :root[data-theme="neon-focus"].dark {
     --background: 260 35% 8%;
     --foreground: 280 30% 96%;
